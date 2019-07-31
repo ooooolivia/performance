@@ -68,12 +68,12 @@ def remove_directory(path: str) -> None:
 
 def get_script_path() -> str:
     '''Gets this script directory.'''
-    return sys.path[0]
+    return os.path.dirname(os.path.realpath(__file__))
 
 
 def get_repo_root_path() -> str:
     '''Gets repository root directory.'''
-    return os.path.abspath(os.path.join(get_script_path(), '..'))
+    return os.path.abspath(os.path.join(get_script_path(), '..', '..'))
 
 
 def get_tools_directory() -> str:
