@@ -21,6 +21,7 @@ import sys
 
 from performance.common import get_repo_root_path
 from performance.common import get_artifacts_directory
+from performance.common import get_packages_directory
 from performance.common import remove_directory
 from performance.common import validate_supported_runtime
 from performance.logger import setup_loggers
@@ -129,13 +130,6 @@ def get_supported_configurations() -> list:
     projects is 'Release'
     '''
     return ['Release', 'Debug']
-
-
-def get_packages_directory() -> str:
-    '''
-    The path to directory where packages should get restored
-    '''
-    return path.join(get_artifacts_directory(), 'packages')
 
 
 def add_arguments(parser: ArgumentParser) -> ArgumentParser:
