@@ -284,6 +284,55 @@ class CSharpProject:
                     cmdline = cmdline + list(args)
                 RunCommand(cmdline, verbose=verbose).run(
                     self.working_directory)
+    @staticmethod
+    def new(template: str,
+            output_dir: str,
+            verbose: bool,
+            working_directory: str,
+            force: bool = False
+            ):
+        '''
+        Creates a new project with the specified template
+        '''
+        cmdline = [
+            'dotnet', 'new',
+            template,
+            '--output', output_dir,
+        ]
+        if force:
+            cmdline += ['--force']
+
+        RunCommand(cmdline, verbose=verbose).run(
+            working_directory
+        )
+        # the file could be any project type. let's guess.
+
+        return CSharpProject(CSharpProjFile(path.join(output_dir, '%s.csproj' % output_dir),
+                                            working_directory),
+                             path.join(output_dir, 'bin'))
+
+    def publish(self,
+                configuration: str,
+                output_dir: str,
+                verbose: bool,
+                target_framework_moniker: list,
+                runtime_identifier: str = None,
+               ) -> None:
+        '''
+        Invokes publish on the specified project
+        '''
+        cmdline = [
+            'dotnet', 'publish',
+            self.csproj_file,
+            '--configuration', configuration,
+            '--output', output_dir
+        ]
+        if runtime_identifier:
+            cmdline += ['--runtime', runtime_identifier]
+
+        RunCommand(cmdline, verbose=verbose).run(
+            self.working_directory
+        )
 
     @staticmethod
     def __print_complus_environment() -> None:

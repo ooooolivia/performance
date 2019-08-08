@@ -87,6 +87,12 @@ def get_artifacts_directory() -> str:
     '''
     return os.path.join(get_repo_root_path(), 'artifacts')
 
+def get_packages_directory() -> str:
+    '''
+    The path to directory where packages should get restored
+    '''
+    return os.path.join(get_artifacts_directory(), 'packages')
+
 @contextmanager
 def push_dir(path: str = None) -> None:
     '''
