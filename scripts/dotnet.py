@@ -264,6 +264,7 @@ class CSharpProject:
                 self.csproj_file,
                 '--configuration', configuration,
                 '--no-restore',
+                '--output', self.__bin_directory,
                 "/p:NuGetPackageRoot={}".format(packages_path),
             ]
             if args:
@@ -278,6 +279,7 @@ class CSharpProject:
                     '--configuration', configuration,
                     '--framework', target_framework_moniker,
                     '--no-restore',
+                    '--output', self.__bin_directory,
                     "/p:NuGetPackageRoot={}".format(packages_path),
                 ]
                 if args:

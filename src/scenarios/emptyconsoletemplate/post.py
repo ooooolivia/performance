@@ -2,10 +2,7 @@
 post cleanup script
 '''
 
-# from shutil import rmtree
+from shutil import rmtree
 
-# rmtree('build')
-# rmtree('publish')
-
-def a():
-    print("a")
+rmtree('build')
+rmtree('publish')
