@@ -2,13 +2,15 @@
 Module for running scenario tasks
 '''
 
-from os import environ
 from collections import namedtuple
-from startup import StartupWrapper
+from shared.startup import StartupWrapper
+from performance.logger import setup_loggers
+
 
 reqfields = ('scenarioname',
              'logname',
-             'appbin')
+             'appbin',
+             'framework')
 optfields = ('startup', 
              'sdk',
              'guiapp',
@@ -17,6 +19,7 @@ optfields = ('startup',
              'apppublish',
              'iterations',
              'timeout',
+             'warmup'
              )
 
 
@@ -26,10 +29,11 @@ class Runner:
     '''
     Wrapper for running all the things
     '''
-    
+
     def __init__(self, traits: TestTraits):
         self.traits = traits
-    
+        setup_loggers(True)
+
     def run(self):
         '''
         Runs the specified scenario

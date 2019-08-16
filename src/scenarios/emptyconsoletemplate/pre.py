@@ -1,12 +1,12 @@
 '''
 pre-command
 '''
-
-import paths
-# from performance.common import *
-from dotnet import CSharpProject, CSharpProjFile
-# from logging import getLogger
 import sys
+# from performance.common import *
+from dotnet import CSharpProject
+from performance.logger import setup_loggers
+
+setup_loggers(True)
 
 project = CSharpProject.new(template='console',
                             output_dir='build',
