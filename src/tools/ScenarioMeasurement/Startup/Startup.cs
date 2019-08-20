@@ -1,9 +1,10 @@
-﻿using Microsoft.Diagnostics.Tracing.Parsers;
-using Microsoft.Diagnostics.Tracing.Session;
-using Reporting;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Diagnostics.Tracing.Parsers;
+using Microsoft.Diagnostics.Tracing.Session;
+using Reporting;
 
 namespace ScenarioMeasurement
 {
@@ -11,12 +12,13 @@ namespace ScenarioMeasurement
     {
         TimeToMain,
         GenericStartup,
+        ProcessTime,
         WPF
     }
     class Startup
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="appExe">Full path to test executable</param>
         /// <param name="metricType">Type of interval measurement</param>
@@ -33,6 +35,10 @@ namespace ScenarioMeasurement
         /// <param name="guiApp">true: app under test is a GUI app, false: console</param>
         /// <param name="skipProfileIteration">true: skip full results iteration</param>
         /// <param name="reportJsonPath">path to save report json</param>
+        /// <param name="iterationSetup">command to set up before each iteration</param>
+        /// <param name="setupArgs">arguments of iterationSetup</param>
+        /// <param name="iterationCleanup">command to clean up after each iteration</param>
+        /// <param name="cleanupArgs">arguments of iterationCleanup</param>
         /// <returns></returns>
         static int Main(string appExe,
                         MetricType metricType,
@@ -40,6 +46,10 @@ namespace ScenarioMeasurement
                         string traceFileName,
                         bool processWillExit = false,
                         int iterations = 5,
+                        string iterationSetup = "",
+                        string setupArgs = "",
+                        string iterationCleanup = "",
+                        string cleanupArgs = "",
                         int timeout = 60,
                         int measurementDelay = 15,
                         string appArgs = "",
@@ -72,10 +82,28 @@ namespace ScenarioMeasurement
                 WorkingDirectory = workingDir,
                 GuiApp = guiApp
             };
+
+            // create iteration setup process helper
+            logger.Log($"Iteration set up: {iterationSetup} (args: {setupArgs})");
+            ProcessHelper setupProcHelper = null;
+            if (!String.IsNullOrEmpty(iterationSetup))
+            {
+                setupProcHelper = CreateProcHelper(iterationSetup, setupArgs, workingDir);
+            }
+
+            // create iteration cleanup process helper
+            logger.Log($"Iteration clean up: {iterationCleanup} (args: {cleanupArgs})");
+            ProcessHelper cleanupProcHelper = null;
+            if (!String.IsNullOrEmpty(iterationCleanup))
+            {
+                cleanupProcHelper = CreateProcHelper(iterationCleanup, cleanupArgs, workingDir);
+            }
+
             Util.Init();
 
             if (warmup)
             {
+                logger.Log("=============== Warm up ================");
                 procHelper.Run();
             }
 
@@ -90,10 +118,15 @@ namespace ScenarioMeasurement
                 case MetricType.GenericStartup:
                     parser = new GenericStartupParser();
                     break;
+                case MetricType.ProcessTime:
+                    parser = new ProcessTimeParser();
+                    break;
                     //case MetricType.WPF:
                     //    parser = new WPFParser();
                     //    break;
             }
+
+            var pids = new List<int>();
             using (var kernel = new TraceEventSession(KernelTraceEventParser.KernelSessionName, kernelTraceFile))
             {
                 parser.EnableKernelProvider(kernel);
@@ -102,12 +135,42 @@ namespace ScenarioMeasurement
                     parser.EnableUserProviders(user);
                     for (int i = 0; i < iterations; i++)
                     {
-                        var result = procHelper.Run();
-                        if (result != ProcessHelper.Result.Success)
+                        logger.Log($"=============== Iteration {i} ================ ");
+                        // set up iteration
+                        if (setupProcHelper != null)
                         {
-                            logger.Log($"failed. result: {result}");
+                            var setupResult = setupProcHelper.Run().result;
+                            if (setupResult != ProcessHelper.Result.Success)
+                            {
+                                logger.Log($"Failed to set up. Result: {setupResult}");
+                                failed = true;
+                                break;
+                            }
+                        }
+
+                        // run iteration
+                        var runResult = procHelper.Run();
+                        if (runResult.result == ProcessHelper.Result.Success)
+                        {
+                            pids.Add(runResult.pid);
+                        }
+                        else
+                        {
+                            logger.Log($"Failed to run. Result: {runResult.result}");
                             failed = true;
                             break;
+                        }
+
+                        // clean up iteration
+                        if (cleanupProcHelper != null)
+                        {
+                            var cleanupResult = cleanupProcHelper.Run().result;
+                            if (cleanupResult != ProcessHelper.Result.Success)
+                            {
+                                logger.Log($"Failed to clean up. Result: {cleanupResult}");
+                                failed = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -116,12 +179,23 @@ namespace ScenarioMeasurement
             if (!failed)
             {
                 logger.Log("Parsing..");
-                TraceEventSession.Merge(new[] { kernelTraceFile, userTraceFile }, traceFileName);
-                var counters = parser.Parse(traceFileName, Path.GetFileNameWithoutExtension(appExe));
+                var files = new List<string> { kernelTraceFile };
+                if (File.Exists(userTraceFile))
+                {
+                    files.Add(userTraceFile);
+                }
+                TraceEventSession.Merge(files.ToArray(), traceFileName);
+                var counters = parser.Parse(traceFileName, Path.GetFileNameWithoutExtension(appExe), pids);
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 foreach (var counter in counters)
                 {
-                    logger.Log($"{counter.Name,-15}: {counter.Results.Average():F3} {counter.MetricName}");
+                    string average = $"Average {counter.Results.Average():F3} {counter.MetricName}";
+                    string max = $"Max {counter.Results.Max():F3} {counter.MetricName}";
+                    string min = $"Min {counter.Results.Min():F3} {counter.MetricName}";
+                    logger.Log($"{counter.Name,-15}: {average,-25}|{max,-25}|{min,-25}");
                 }
+                Console.ResetColor();
 
                 var reporter = Reporter.CreateReporter();
                 if (reporter != null)
@@ -136,7 +210,6 @@ namespace ScenarioMeasurement
                         File.WriteAllText(reportJsonPath, reporter.GetJson());
                     }
                 }
-             
             }
 
             File.Delete(kernelTraceFile);
@@ -154,10 +227,10 @@ namespace ScenarioMeasurement
                     using (var user = new TraceEventSession("ProfileSession", profileUserTraceFile))
                     {
                         profiler.EnableUserProviders(user);
-                        var result = procHelper.Run();
+                        var result = procHelper.Run().result;
                         if (result != ProcessHelper.Result.Success)
                         {
-                            logger.Log($"failed. result: {result}");
+                            logger.Log($"Failed. Result: {result}");
                             failed = true;
                         }
                     }
@@ -173,6 +246,19 @@ namespace ScenarioMeasurement
 
             return (failed ? -1 : 0);
 
+        }
+
+        private static ProcessHelper CreateProcHelper(string command, string args, string workingDir)
+        {
+            var procHelper = new ProcessHelper()
+            {
+                ProcessWillExit = true,
+                Executable = command,
+                Arguments = args,
+                WorkingDirectory = workingDir,
+                Timeout = 300
+            };
+            return procHelper;
         }
     }
 }

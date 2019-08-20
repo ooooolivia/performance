@@ -1,2 +1,3 @@
 $scripts = Join-Path $PSScriptRoot '..\..\scripts\' -Resolve
-$env:PYTHONPATH="$scripts;$PSScriptRoot"
+$shared = Join-Path $PSScriptRoot 'shared' -Resolve
+$env:PYTHONPATH="$scripts;$PSScriptRoot;$shared"

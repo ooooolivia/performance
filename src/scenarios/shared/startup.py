@@ -46,6 +46,7 @@ class StartupWrapper(object):
         startup_args = [
             self.startupexe,
             '--app-exe', kwargs['apppublish'],
+            '--app-args', kwargs['appargs'],
             '--metric-type', kwargs['startupmetric'], 
             '--scenario-name', kwargs['scenarioname'],
             '--trace-file-name', '%s_startup.etl' % kwargs['logname'],
@@ -56,6 +57,13 @@ class StartupWrapper(object):
             '--warmup', '%s' % (kwargs['warmup'] or 'true'),
             '--gui-app', kwargs['guiapp'],
             '--working-dir', sys.path[0],
-            '--report-json-path', '%s.json' % kwargs['logname']
+            '--report-json-path', '%s.json' % kwargs['logname'],
         ]
+
+        # optional arguments
+        if kwargs['iterationsetup']:
+            startup_args.extend(['--iteration-setup', kwargs['iterationsetup']])
+        if kwargs['setupargs']:
+            startup_args.extend(['--setup-args', kwargs['setupargs']])
+
         RunCommand(startup_args, verbose=True).run()
