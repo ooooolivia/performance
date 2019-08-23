@@ -13,10 +13,13 @@ def helixpayload():
     return environ.get('HELIX_CORRELATION_PAYLOAD')
 
 def extension():
+    'gets platform specific extension'
     return '.exe' if sys.platform == 'win32' else ''
 
-def appbin():
-    return os.path.join(const.BINDIR, '%s%s' % (const.BINDIR, extension()))
+def builtexe(exename: str):
+    'gets binary path'
+    return os.path.join(const.BINDIR, '%s%s' % (exename, extension()))
 
-def pubbin():
-    return os.path.join(const.PUBDIR, '%s%s' % (const.BINDIR, extension()))
+def publishedexe(exename: str):
+    'gets binary path for published exe'
+    return os.path.join(const.PUBDIR, '%s%s' % (exename, extension()))

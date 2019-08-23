@@ -7,7 +7,7 @@ import os
 from performance.logger import setup_loggers
 from performance.common import get_artifacts_directory, get_packages_directory, RunCommand
 from dotnet import CSharpProject, CSharpProjFile
-from shared.util import helixpayload, appbin, pubbin
+from shared.util import helixpayload, builtexe, publishedexe
 from shared.const import *
 class StartupWrapper(object):
     '''
@@ -49,14 +49,14 @@ class StartupWrapper(object):
             '--app-exe', apptorun,
             '--metric-type', kwargs['startupmetric'], 
             '--scenario-name', "%s - %s" % (kwargs['scenarioname'], kwargs['scenariotypename']),
-            '--trace-file-name', '%s_startup.etl' % kwargs['logname'],
+            '--trace-file-name', '%s_startup.etl' % kwargs['exename'],
             '--process-will-exit', 'true', # ???
             '--iterations', '%s' % (kwargs['iterations'] or '5'),
             '--timeout', '%s' % (kwargs['timeout'] or '20'),
-            '--log-file-name', '%s_startup.log' % kwargs['logname'],
+            '--log-file-name', '%s_startup.log' % kwargs['exename'],
             '--warmup', '%s' % (kwargs['warmup'] or 'true'),
             '--gui-app', kwargs['guiapp'],
             '--working-dir', sys.path[0],
-            '--report-json-path', '%s.json' % kwargs['logname']
+            '--report-json-path', '%s.json' % kwargs['exename']
         ]
         RunCommand(startup_args, verbose=True).run()

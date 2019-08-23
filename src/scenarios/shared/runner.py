@@ -7,12 +7,12 @@ from logging import getLogger
 from collections import namedtuple
 from argparse import ArgumentParser
 from shared.startup import StartupWrapper
-from shared.util import pubbin
+from shared.util import publishedexe
 from shared import const
 from performance.logger import setup_loggers
 
 reqfields = ('scenarioname',
-             'logname',
+             'exename',
              'framework')
 optfields = ('guiapp',
              'startupmetric',
@@ -61,7 +61,7 @@ class Runner:
             startup = StartupWrapper()
             startup.runtests(**self.traits._asdict(),
                              scenariotypename=const.STARTUP,
-                             apptorun=pubbin())
+                             apptorun=publishedexe(self.traits.exename))
         # if testtype == 'sdk' and self.traits.sdk:
         #     print("sdk")
         #     startup = StartupWrapper()
