@@ -291,7 +291,8 @@ class CSharpProject:
             output_dir: str,
             verbose: bool,
             working_directory: str,
-            force: bool = False
+            force: bool = False,
+            exename: str = None
             ):
         '''
         Creates a new project with the specified template
@@ -303,13 +304,16 @@ class CSharpProject:
         ]
         if force:
             cmdline += ['--force']
+        
+        if exename:
+            cmdline += ['--name', exename]
 
         RunCommand(cmdline, verbose=verbose).run(
             working_directory
         )
         # the file could be any project type. let's guess.
 
-        return CSharpProject(CSharpProjFile(path.join(output_dir, '%s.csproj' % output_dir),
+        return CSharpProject(CSharpProjFile(path.join(output_dir, '%s.csproj' % (exename or output_dir)),
                                             working_directory),
                              path.join(output_dir, 'bin'))
 
