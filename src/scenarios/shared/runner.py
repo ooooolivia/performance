@@ -22,6 +22,8 @@ optfields = ('guiapp',
              'warmup'
              )
 
+# These are the kinds of scenarios we run. Default here indicates whether ALL
+# scenarios should try and run a given test type.
 testtypes = {STARTUP: True,
              SDK: True}
 
