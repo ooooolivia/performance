@@ -2,7 +2,6 @@
 pre-command
 '''
 import sys
-# from performance.common import *
 from dotnet import CSharpProject
 from performance.logger import setup_loggers
 from shared import const
