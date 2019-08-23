@@ -11,4 +11,4 @@ SCENARIO_NAMES = {STARTUP: 'Startup',
                   SDK: 'SDK'}
 
 BINDIR = 'bindir'
-PUBIDR = 'pubdir'
+PUBDIR = 'pubdir'

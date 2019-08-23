@@ -12,12 +12,10 @@ from shared import const
 
 reqfields = ('scenarioname',
              'logname',
-             'appbin',
              'framework')
 optfields = ('guiapp',
              'startupmetric',
              'appargs',
-             'apppublish',
              'iterations',
              'timeout',
              'warmup'

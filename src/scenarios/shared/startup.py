@@ -7,7 +7,7 @@ import os
 from performance.logger import setup_loggers
 from performance.common import get_artifacts_directory, get_packages_directory, RunCommand
 from dotnet import CSharpProject, CSharpProjFile
-from shared.util import helixpayload
+from shared.util import helixpayload, appbin, pubbin
 from shared.const import *
 class StartupWrapper(object):
     '''
@@ -40,13 +40,13 @@ class StartupWrapper(object):
         '''
         Runs tests through startup
         '''
-        for key in ['startupmetric', 'guiapp', 'apppublish']:
+        for key in ['startupmetric', 'guiapp']:
             if not kwargs[key]:
                 raise Exception('startup tests require %s' % key)
 
         startup_args = [
             self.startupexe,
-            '--app-exe', kwargs['apppublish'],
+            '--app-exe', pubbin(),
             '--metric-type', kwargs['startupmetric'], 
             '--scenario-name', "%s - %s" % (kwargs['scenarioname'], kwargs['scenariotypename']),
             '--trace-file-name', '%s_startup.etl' % kwargs['logname'],
