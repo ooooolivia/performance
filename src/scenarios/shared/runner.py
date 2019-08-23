@@ -8,7 +8,7 @@ from collections import namedtuple
 from argparse import ArgumentParser
 from shared.startup import StartupWrapper
 from performance.logger import setup_loggers
-
+from shared.const import *
 reqfields = ('scenarioname',
              'logname',
              'appbin',
@@ -22,8 +22,8 @@ optfields = ('guiapp',
              'warmup'
              )
 
-testtypes = {'startup': True,
-             'sdk': True}
+testtypes = {STARTUP: True,
+             SDK: True}
 
 TestTraits = namedtuple('TestTraits', 
                         reqfields  + tuple(testtypes.keys()) + optfields, 
@@ -44,23 +44,21 @@ class Runner:
         Parses input args to the script
         '''
         parser = ArgumentParser()
-        parser.add_argument('testtype', choices=testtypes)
+        parser.add_argument('testtype', choices=testtypes, type=str.lower)
         args = parser.parse_args()
         if not getattr(self.traits, args.testtype):
             getLogger().error("Test type %s is not supported by this scenario", args.testtype)
             sys.exit(1)
         self.testtype = args.testtype
-
     def run(self):
         '''
         Runs the specified scenario
         '''
         self.parseargs()
-        if self.testtype == 'startup' and self.traits.startup:
-            
+        if self.testtype == STARTUP:
             startup = StartupWrapper()
             startup.runtests(**self.traits._asdict(),
-            scenariotypename='Startup')
+            scenariotypename=STARTUP)
         # if testtype == 'sdk' and self.traits.sdk:
         #     print("sdk")
         #     startup = StartupWrapper()
