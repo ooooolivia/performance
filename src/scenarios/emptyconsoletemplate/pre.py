@@ -9,7 +9,7 @@ from shared import const
 setup_loggers(True)
 
 CSharpProject.new(template='console',
-                            output_dir=const.BINDIR,
-                            working_directory=sys.path[0],
-                            force=True,
-                            verbose=True)
+                  output_dir=const.BINDIR,
+                  working_directory=sys.path[0],
+                  force=True,
+                  verbose=True)
