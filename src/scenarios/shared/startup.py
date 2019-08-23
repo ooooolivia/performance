@@ -8,6 +8,7 @@ from performance.logger import setup_loggers
 from performance.common import get_artifacts_directory, get_packages_directory, RunCommand
 from dotnet import CSharpProject, CSharpProjFile
 from shared.util import helixpayload
+from shared.const import *
 class StartupWrapper(object):
     '''
     Wraps startup.exe, building it if necessary.
@@ -15,7 +16,7 @@ class StartupWrapper(object):
     def __init__(self):
         payload = helixpayload()
         if payload:
-            self.setstartuppath(os.path.join('tools', 'startup', payload))
+            self._setstartuppath(os.path.join('tools', 'startup', payload))
         else:
             startupproj = os.path.join('..',
                                        '..',
@@ -29,10 +30,10 @@ class StartupWrapper(object):
                                     os.path.join(get_artifacts_directory(), 'startup')))
             startup.restore(get_packages_directory(), True)
             startup.build('Release', ['netcoreapp3.0'], True, get_packages_directory())
-            self.setstartuppath(startup.bin_path)
+            self._setstartuppath(startup.bin_path)
 
     
-    def setstartuppath(self, path: str):
+    def _setstartuppath(self, path: str):
         self.startupexe = os.path.join(path, 'Startup.exe')
 
     def runtests(self, **kwargs):
@@ -47,7 +48,7 @@ class StartupWrapper(object):
             self.startupexe,
             '--app-exe', kwargs['apppublish'],
             '--metric-type', kwargs['startupmetric'], 
-            '--scenario-name', kwargs['scenarioname'],
+            '--scenario-name', "%s - %s" % (kwargs['scenarioname'], kwargs['scenariotypename']),
             '--trace-file-name', '%s_startup.etl' % kwargs['logname'],
             '--process-will-exit', 'true', # ???
             '--iterations', '%s' % (kwargs['iterations'] or '5'),
