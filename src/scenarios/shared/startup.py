@@ -15,7 +15,7 @@ class StartupWrapper(object):
     def __init__(self):
         payload = helixpayload()
         if payload:
-            self.setstartuppath(payload)
+            self.setstartuppath(os.path.join('tools', 'startup', payload))
         else:
             startupproj = os.path.join('..',
                                        '..',
