@@ -19,4 +19,4 @@ def appbin():
     return os.path.join(const.BINDIR, '%s%s' % (const.BINDIR, extension()))
 
 def pubbin():
-    return os.path.join(const.PUBDIR), '%s%s' % (const.BINDIR, extension()))
+    return os.path.join(const.PUBDIR, '%s%s' % (const.BINDIR, extension()))
