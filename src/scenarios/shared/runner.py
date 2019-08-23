@@ -7,8 +7,9 @@ from logging import getLogger
 from collections import namedtuple
 from argparse import ArgumentParser
 from shared.startup import StartupWrapper
-from performance.logger import setup_loggers
+from shared.util import pubbin
 from shared import const
+from performance.logger import setup_loggers
 
 reqfields = ('scenarioname',
              'logname',
@@ -59,7 +60,8 @@ class Runner:
         if self.testtype == const.STARTUP:
             startup = StartupWrapper()
             startup.runtests(**self.traits._asdict(),
-            scenariotypename=const.STARTUP)
+                             scenariotypename=const.STARTUP,
+                             apptorun=pubbin())
         # if testtype == 'sdk' and self.traits.sdk:
         #     print("sdk")
         #     startup = StartupWrapper()

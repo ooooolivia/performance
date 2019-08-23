@@ -36,7 +36,7 @@ class StartupWrapper(object):
     def _setstartuppath(self, path: str):
         self.startupexe = os.path.join(path, 'Startup.exe')
 
-    def runtests(self, **kwargs):
+    def runtests(self, apptorun: str, **kwargs):
         '''
         Runs tests through startup
         '''
@@ -46,7 +46,7 @@ class StartupWrapper(object):
 
         startup_args = [
             self.startupexe,
-            '--app-exe', pubbin(),
+            '--app-exe', apptorun,
             '--metric-type', kwargs['startupmetric'], 
             '--scenario-name', "%s - %s" % (kwargs['scenarioname'], kwargs['scenariotypename']),
             '--trace-file-name', '%s_startup.etl' % kwargs['logname'],
