@@ -17,6 +17,5 @@ traits = TestTraits(scenarioname='C# Console Template',
                     framework='netcoreapp3.0',
                     startupmetric='TimeToMain',
                     guiapp='false', # string passed through to tool
-                    startup=True)
-runner = Runner(traits)
-runner.run()
+                    )
+Runner(traits).run()
