@@ -8,7 +8,8 @@ from collections import namedtuple
 from argparse import ArgumentParser
 from shared.startup import StartupWrapper
 from performance.logger import setup_loggers
-from shared.const import *
+from shared import const
+
 reqfields = ('scenarioname',
              'logname',
              'appbin',
@@ -24,8 +25,8 @@ optfields = ('guiapp',
 
 # These are the kinds of scenarios we run. Default here indicates whether ALL
 # scenarios should try and run a given test type.
-testtypes = {STARTUP: True,
-             SDK: True}
+testtypes = {const.STARTUP: True,
+             const.SDK: True}
 
 TestTraits = namedtuple('TestTraits', 
                         reqfields  + tuple(testtypes.keys()) + optfields, 
@@ -57,10 +58,10 @@ class Runner:
         Runs the specified scenario
         '''
         self.parseargs()
-        if self.testtype == STARTUP:
+        if self.testtype == const.STARTUP:
             startup = StartupWrapper()
             startup.runtests(**self.traits._asdict(),
-            scenariotypename=STARTUP)
+            scenariotypename=const.STARTUP)
         # if testtype == 'sdk' and self.traits.sdk:
         #     print("sdk")
         #     startup = StartupWrapper()
