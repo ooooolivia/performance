@@ -187,7 +187,6 @@ namespace ScenarioMeasurement
                 TraceEventSession.Merge(files.ToArray(), traceFileName);
                 var counters = parser.Parse(traceFileName, Path.GetFileNameWithoutExtension(appExe), pids);
 
-                Console.ForegroundColor = ConsoleColor.Cyan;
                 foreach (var counter in counters)
                 {
                     string average = $"Average {counter.Results.Average():F3} {counter.MetricName}";
@@ -195,7 +194,6 @@ namespace ScenarioMeasurement
                     string min = $"Min {counter.Results.Min():F3} {counter.MetricName}";
                     logger.Log($"{counter.Name,-15}: {average,-25}|{max,-25}|{min,-25}");
                 }
-                Console.ResetColor();
 
                 var reporter = Reporter.CreateReporter();
                 if (reporter != null)
