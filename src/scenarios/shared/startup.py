@@ -53,7 +53,6 @@ class StartupWrapper(object):
             '--process-will-exit', 'true', # ???
             '--iterations', '%s' % (kwargs['iterations'] or '5'),
             '--timeout', '%s' % (kwargs['timeout'] or '20'),
-            '--log-file-name', '%s_startup.log' % kwargs['exename'],
             '--warmup', '%s' % (kwargs['warmup'] or 'true'),
             '--gui-app', kwargs['guiapp'],
             '--working-dir', sys.path[0],

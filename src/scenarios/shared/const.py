@@ -10,5 +10,6 @@ R2R = 'r2r'
 SCENARIO_NAMES = {STARTUP: 'Startup',
                   SDK: 'SDK'}
 
-BINDIR = 'app'
+BINDIR = 'bin'
 PUBDIR = 'pub'
+APPDIR = 'app'

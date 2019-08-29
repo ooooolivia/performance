@@ -289,6 +289,7 @@ class CSharpProject:
     @staticmethod
     def new(template: str,
             output_dir: str,
+            bin_dir: str,
             verbose: bool,
             working_directory: str,
             force: bool = False,
@@ -315,13 +316,14 @@ class CSharpProject:
 
         return CSharpProject(CSharpProjFile(path.join(output_dir, '%s.csproj' % (exename or output_dir)),
                                             working_directory),
-                             path.join(output_dir, 'bin'))
+                             bin_dir)
 
     def publish(self,
                 configuration: str,
                 output_dir: str,
                 verbose: bool,
-                target_framework_moniker: list,
+                packages_path,
+                target_framework_moniker: str = None,
                 runtime_identifier: str = None,
                ) -> None:
         '''
@@ -331,10 +333,14 @@ class CSharpProject:
             'dotnet', 'publish',
             self.csproj_file,
             '--configuration', configuration,
-            '--output', output_dir
+            '--output', output_dir,
+            "/p:NuGetPackageRoot={}".format(packages_path)
         ]
         if runtime_identifier:
             cmdline += ['--runtime', runtime_identifier]
+
+        if target_framework_moniker:
+            cmdline += ['--framework', target_framework_moniker]
 
         RunCommand(cmdline, verbose=verbose).run(
             self.working_directory
