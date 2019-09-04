@@ -10,16 +10,18 @@ from shared.startup import StartupWrapper
 from shared.util import publishedexe
 from shared import const
 from performance.logger import setup_loggers
+from shared import cleanprojectsetup
 
 reqfields = ('scenarioname',
-             'exename',
-             'framework')
+             'exename')
 optfields = ('guiapp',
              'startupmetric',
              'appargs',
              'iterations',
              'timeout',
-             'warmup'
+             # 'warmup',
+             # 'iterationsetup',
+             # 'setupargs',
              )
 
 # These are the kinds of scenarios we run. Default here indicates whether ALL
@@ -28,8 +30,9 @@ testtypes = {const.STARTUP: True,
              const.SDK: True}
 
 TestTraits = namedtuple('TestTraits', 
-                        reqfields  + tuple(testtypes.keys()) + optfields, 
+                        reqfields + tuple(testtypes.keys()) + optfields,
                         defaults=tuple(testtypes.values()) + (None,) * len(optfields))
+
 
 class Runner:
     '''
@@ -52,6 +55,8 @@ class Runner:
             getLogger().error("Test type %s is not supported by this scenario", args.testtype)
             sys.exit(1)
         self.testtype = args.testtype
+
+
     def run(self):
         '''
         Runs the specified scenario
@@ -62,11 +67,34 @@ class Runner:
             startup.runtests(**self.traits._asdict(),
                              scenariotypename=const.STARTUP,
                              apptorun=publishedexe(self.traits.exename))
-        # if testtype == 'sdk' and self.traits.sdk:
-        #     print("sdk")
-        #     startup = StartupWrapper()
-        #     startup.runtests(**self.traits._asdict(),
-        #         scenariotypename='Build No Changes')
-        #     # fix some other traits
-        #     startup.runtests(**self.traits._asdict(),
-        #         scenariotypename='Rebuild')
+
+        elif self.testtype == const.SDK:
+            startup = StartupWrapper()
+            startup.runtests(scenarioname=self.traits.scenarioname,
+                             exename=self.traits.exename,
+                             guiapp=self.traits.guiapp,
+                             startupmetric=self.traits.startupmetric,
+                             appargs=self.traits.appargs,
+                             timeout=self.traits.timeout,
+                             warmup='false',
+                             iterations=self.traits.iterations,
+                             scenariotypename='%s (%s)' % (const.SDK, const.BUILD_CLEAN),
+                             apptorun=self.traits.exename,
+                             iterationsetup=const.PYTHON,
+                             setupargs='..\\shared\\cleanprojectsetup.py NetCoreApp'
+                             )
+
+            startup.runtests(scenarioname=self.traits.scenarioname,
+                             exename=self.traits.exename,
+                             guiapp=self.traits.guiapp,
+                             startupmetric=self.traits.startupmetric,
+                             appargs=self.traits.appargs,
+                             timeout=self.traits.timeout,
+                             warmup='true',
+                             iterations=self.traits.iterations,
+                             scenariotypename='%s (%s)' % (const.SDK, const.BUILD_NO_CHANGES),
+                             apptorun=self.traits.exename,
+                             iterationsetup=None,
+                             setupargs=None
+                             )
+
