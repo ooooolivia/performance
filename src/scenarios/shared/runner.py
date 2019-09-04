@@ -10,7 +10,6 @@ from shared.startup import StartupWrapper
 from shared.util import publishedexe
 from shared import const
 from performance.logger import setup_loggers
-from shared import cleanprojectsetup
 
 reqfields = ('scenarioname',
              'exename')
@@ -81,7 +80,7 @@ class Runner:
                              scenariotypename='%s (%s)' % (const.SDK, const.BUILD_CLEAN),
                              apptorun=self.traits.exename,
                              iterationsetup=const.PYTHON,
-                             setupargs='..\\shared\\cleanprojectsetup.py NetCoreApp'
+                             setupargs='..\\shared\\cleanprojectsetup.py'
                              )
 
             startup.runtests(scenarioname=self.traits.scenarioname,

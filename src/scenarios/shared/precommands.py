@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 from dotnet import CSharpProject, CSharpProjFile
 from shared import const
 from performance.common import get_packages_directory
-from shutil import copytree
+from shutil import copytree, rmtree
 import os
 
 BUILD = 'build'
@@ -64,7 +64,10 @@ class PreCommands:
 
     def backup(self, folder):
         'make a temp copy of the asset'
-        copytree(folder, os.path.join(const.TMPDIR, folder))
+        tmp = os.path.join(const.TMPDIR, folder)
+        if os.path.isdir(tmp):
+            rmtree(tmp)
+        copytree(folder, tmp)
 
     def _publish(self, configuration: str):
         self.project.publish(configuration=configuration,
