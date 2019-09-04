@@ -26,7 +26,7 @@ class PreCommands:
         self.projectfile = None
         parser = ArgumentParser()
         parser.add_argument('operation', choices=OPERATIONS)
-        parser.add_argument('-c', '--configuration', dest='configuration', choices=['Debug', 'Release'])
+        parser.add_argument('-c', '--configuration', dest='configuration', choices=['Debug', 'Release'], required=True)
         args = parser.parse_args()
         self.configuration = args.configuration
         self.operation = args.operation
