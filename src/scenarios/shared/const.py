@@ -10,6 +10,13 @@ R2R = 'r2r'
 SCENARIO_NAMES = {STARTUP: 'Startup',
                   SDK: 'SDK'}
 
-BINDIR = 'bin'
+BINDIR = 'app'
 PUBDIR = 'pub'
-APPDIR = 'app'
+TMPDIR = 'tmp'
+
+DOTNET = 'dotnet'
+PYTHON = 'python'
+
+BUILD_CLEAN = 'Build Clean'
+BUILD_NO_CHANGES = 'Build No Changes'
+
