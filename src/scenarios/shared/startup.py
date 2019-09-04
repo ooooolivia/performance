@@ -53,9 +53,20 @@ class StartupWrapper(object):
             '--process-will-exit', 'true', # ???
             '--iterations', '%s' % (kwargs['iterations'] or '5'),
             '--timeout', '%s' % (kwargs['timeout'] or '20'),
+            '--log-file-name', '%s_startup.log' % kwargs['exename'],
             '--warmup', '%s' % (kwargs['warmup'] or 'true'),
             '--gui-app', kwargs['guiapp'],
             '--working-dir', sys.path[0],
             '--report-json-path', '%s.json' % kwargs['exename']
         ]
+
+        # optional arguments
+        if kwargs['appargs']:
+            startup_args.extend(['--app-args', kwargs['appargs']])
+        if kwargs['iterationsetup']:
+            startup_args.extend(['--iteration-setup', kwargs['iterationsetup']])
+        if kwargs['setupargs']:
+            startup_args.extend(['--setup-args', kwargs['setupargs']])
+            print(kwargs['setupargs'])
+
         RunCommand(startup_args, verbose=True).run()
