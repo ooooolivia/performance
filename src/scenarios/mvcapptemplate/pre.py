@@ -12,6 +12,6 @@ precommands = PreCommands()
 precommands.new(template='mvc',
                 output_dir=const.APPDIR,
                 bin_dir=const.BINDIR,
-                exename=EXENAME,
+                exename=EXENAME,   # not needed if there's just 'dotnet new'
                 working_directory=sys.path[0])
-precommands.execute()
+precommands.backup(const.APPDIR)

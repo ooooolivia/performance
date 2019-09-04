@@ -1,18 +1,25 @@
 '''
 MVC App
 '''
-import sys
 import os
 from shared.runner import TestTraits, Runner
+from shared import const
 
-
-SCENARIONAME = 'MVC App Template'
-EXENAME = 'mvcapptemplate'
+SCENARIO_NAME = 'MVC App Template'
+DIRECTORY_NAME = 'mvcapptemplate'
+EXENAME = DIRECTORY_NAME
+PROJECT_FILE = os.path.join(const.APPDIR, DIRECTORY_NAME+'.csproj')
 
 if __name__ == "__main__":
-    traits = TestTraits(scenarioname=SCENARIONAME,
-                        exename=EXENAME,
-                        startupmetric='PROCESSTIME',
+    traits = TestTraits(scenarioname=SCENARIO_NAME,
+                        exename=const.DOTNET,
+                        appargs="build %s" % PROJECT_FILE,
+                        startupmetric='ProcessTime',
                         guiapp='false',
+                        iterations='1',
+                        sdk=True,
+                        startup=True
                         )
-    Runner(traits).run()
+    runner = Runner(traits)
+    runner.parseargs()
+    runner.run()
