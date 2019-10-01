@@ -219,6 +219,19 @@ namespace ScenarioMeasurement
                     using (var user = new TraceEventSession("ProfileSession", profileUserTraceFile))
                     {
                         profiler.EnableUserProviders(user);
+
+                        // we also need iteration setup here
+                        if (setupProcHelper != null)
+                        {
+                            var setupResult = setupProcHelper.Run().result;
+                            if (setupResult != ProcessHelper.Result.Success)
+                            {
+                                logger.Log($"Failed to set up. Result: {setupResult}");
+                                failed = true;
+                                return 1;
+                            }
+                        }
+
                         var result = procHelper.Run().result;
                         if (result != ProcessHelper.Result.Success)
                         {
@@ -247,7 +260,6 @@ namespace ScenarioMeasurement
                 ProcessWillExit = true,
                 Executable = command,
                 Arguments = args,
-                WorkingDirectory = workingDir,
                 Timeout = 300
             };
             return procHelper;
