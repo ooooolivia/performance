@@ -62,10 +62,11 @@ namespace ScenarioMeasurement
             psi.EnvironmentVariables["MSBuildLoadMicrosoftTargetsReadOnly"] = "true";
             psi.EnvironmentVariables["MSBUILDLOGIMPORTS"] = "1";
             psi.EnvironmentVariables["MSBUILDNODEHANDSHAKESALT "] = "Test Environment for dotnet/sdk";
-            psi.EnvironmentVariables["NUGET_PACKAGES"] = "= E:\\sdk-perf\\artifacts\\.nuget\\packages";
+            psi.EnvironmentVariables["NUGET_PACKAGES"] = "E:\\sdk-perf\\artifacts\\.nuget\\packages";
             psi.EnvironmentVariables["NUGET_PLUGIN_HANDSHAKE_TIMEOUT_IN_SECONDS"] = "20";
             psi.EnvironmentVariables["NUGET_PLUGIN_REQUEST_TIMEOUT_IN_SECONDS"] = "20";
-
+            psi.EnvironmentVariables["NETCoreSdkBundledVersionsProps"] = "E:\\sdk-perf\\.dotnet\\sdk\\3.1.100-preview1-014069\\Microsoft.NETCoreSdk.BundledVersions.props";
+            psi.EnvironmentVariables["MSBUILDDISABLENODEREUSE"] = "1";
 
             psi.FileName = Executable;
             psi.Arguments = Arguments;
