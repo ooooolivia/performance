@@ -3,6 +3,7 @@ using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
 using Reporting;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 
@@ -21,6 +22,7 @@ namespace ScenarioMeasurement
 
         public IEnumerable<Counter> Parse(string mergeTraceFile, string processName, IList<int> pids)
         {
+            Console.WriteLine(string.Join(",", pids));
             var results = new List<double>();
             double threadTime = 0;
             var threadTimes = new List<double>();
@@ -41,6 +43,7 @@ namespace ScenarioMeasurement
                         }
                         pid = evt.ProcessID;
                         start = evt.TimeStampRelativeMSec;
+                        Console.WriteLine($"ProcessName:{evt.ProcessName};ProcessID:{evt.ProcessID};StartTime:{evt.TimeStampRelativeMSec}");
                     }
                 };
 
@@ -75,12 +78,13 @@ namespace ScenarioMeasurement
                         threadTimes.Add(threadTime);
                         threadTime = 0;
                         start = 0;
+                        Console.WriteLine($"ProcessName:{evt.ProcessName};ProcessID:{evt.ProcessID};EndTime:{evt.TimeStampRelativeMSec}");
                     }
                 };
 
                 source.Process();
             }
-
+            Console.WriteLine($"results: {string.Join(",", results)}");
             return new[] { new Counter() { Name = "Process Time", Results = results.ToArray(), TopCounter = true, DefaultCounter = true, HigherIsBetter = false, MetricName = "ms"},
                            new Counter() { Name = "Time on Thread", Results = threadTimes.ToArray(), TopCounter = true, DefaultCounter = false, HigherIsBetter = false, MetricName = "ms" }
             };
