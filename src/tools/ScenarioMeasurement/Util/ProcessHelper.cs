@@ -49,24 +49,21 @@ namespace ScenarioMeasurement
         {
             var psi = new ProcessStartInfo();
 
-            psi.EnvironmentVariables["DOTNET_MSBUILD_SDK_RESOLVER_SDKS_DIR"] = "E:\\sdk-perf\\artifacts\\bin\\Release\\Sdks";
+            psi.EnvironmentVariables["DOTNET_MSBUILD_SDK_RESOLVER_SDKS_DIR"] = "E:\\sdk-3.0.1xx\\artifacts\\bin\\Release\\Sdks";
             psi.EnvironmentVariables["DOTNET_MULTILEVEL_LOOKUP"] = "0";
             psi.EnvironmentVariables["DOTNET_SKIP_FIRST_TIME_EXPERIENCE"] = "1";
-            psi.EnvironmentVariables["MSBuildSDKsPath"] = "E:\\sdk-perf\\artifacts\\bin\\Release\\Sdks";
+            psi.EnvironmentVariables["MSBuildSDKsPath"] = "E:\\sdk-3.0.1xx\\artifacts\\bin\\Release\\Sdks";
             psi.EnvironmentVariables["MSBUILDTARGETOUTPUTLOGGING"] = "true";
-            psi.EnvironmentVariables["DOTNET_MSBUILD_SDK_RESOLVER_SDKS_DIR"] = "E:\\sdk-perf\\artifacts\\bin\\Release\\Sdks";
             psi.EnvironmentVariables["GenerateResourceMSBuildArchitecture"] = "CurrentArchitecture";
             psi.EnvironmentVariables["GenerateResourceMSBuildRuntime"] = "CurrentRuntime";
-            psi.EnvironmentVariables["MicrosoftNETBuildExtensionsTargets"] = "E:\\sdk-perf\\artifacts\\bin\\Release\\Sdks\\Microsoft.NET.Build.Extensions\\msbuildExtensions\\Microsoft\\Microsoft.NET.Build.Extensions\\Microsoft.NET.Build.Extensions.targets";
-            psi.EnvironmentVariables["MSBuildExtensionsPath"] = "E:\\sdk-perf\\.dotnet\\sdk\\3.0.100";
+            psi.EnvironmentVariables["MicrosoftNETBuildExtensionsTargets"] = "E:\\sdk-3.0.1xx\\artifacts\\bin\\Release\\Sdks\\Microsoft.NET.Build.Extensions\\msbuildExtensions\\Microsoft\\Microsoft.NET.Build.Extensions\\Microsoft.NET.Build.Extensions.targets";
+            psi.EnvironmentVariables["MSBuildExtensionsPath"] = "E:\\sdk-3.0.1xx\\.dotnet\\sdk\\3.0.100";
             psi.EnvironmentVariables["MSBuildLoadMicrosoftTargetsReadOnly"] = "true";
             psi.EnvironmentVariables["MSBUILDLOGIMPORTS"] = "1";
-            psi.EnvironmentVariables["MSBUILDNODEHANDSHAKESALT "] = "Test Environment for dotnet/sdk";
-            psi.EnvironmentVariables["NUGET_PACKAGES"] = "E:\\sdk-perf\\artifacts\\.nuget\\packages";
-            psi.EnvironmentVariables["NUGET_PLUGIN_HANDSHAKE_TIMEOUT_IN_SECONDS"] = "20";
-            psi.EnvironmentVariables["NUGET_PLUGIN_REQUEST_TIMEOUT_IN_SECONDS"] = "20";
-            psi.EnvironmentVariables["NETCoreSdkBundledVersionsProps"] = "E:\\sdk-perf\\.dotnet\\sdk\\3.1.100-preview1-014069\\Microsoft.NETCoreSdk.BundledVersions.props";
+            psi.EnvironmentVariables["NUGET_PACKAGES"] = "E:\\sdk-3.0.1xx\\artifacts\\.nuget\\packages";
+            psi.EnvironmentVariables["NETCoreSdkBundledVersionsProps"] = "E:\\sdk-3.0.1xx\\.dotnet\\sdk\\3.0.100\\Microsoft.NETCoreSdk.BundledVersions.props";
             psi.EnvironmentVariables["MSBUILDDISABLENODEREUSE"] = "1";
+            psi.EnvironmentVariables["DOTNET_ROOT"] = "E:\\sdk-3.0.1xx\\.dotnet";
 
             psi.FileName = Executable;
             psi.Arguments = Arguments;

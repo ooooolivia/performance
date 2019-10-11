@@ -39,6 +39,7 @@ namespace ScenarioMeasurement
         /// <param name="setupArgs">arguments of iterationSetup</param>
         /// <param name="iterationCleanup">command to clean up after each iteration</param>
         /// <param name="cleanupArgs">arguments of iterationCleanup</param>
+        /// <param name="csvFile">path to result csv file</param>
         /// <returns></returns>
         static int Main(string appExe,
                         MetricType metricType,
@@ -58,7 +59,8 @@ namespace ScenarioMeasurement
                         bool warmup = true,
                         bool guiApp = true,
                         bool skipProfileIteration = false,
-                        string reportJsonPath = "")
+                        string reportJsonPath = "",
+                        string csvFile = "")
         {
             Logger logger = new Logger(String.IsNullOrEmpty(logFileName) ? $"{appExe}.startup.log" : logFileName);
             static void checkArg(string arg, string name)
@@ -189,6 +191,11 @@ namespace ScenarioMeasurement
 
                 WriteResultTable(counters, logger);
 
+                if (!String.IsNullOrEmpty(csvFile))
+                {
+                    WriteToCSV(scenarioName, csvFile, counters);
+                }
+
                 var reporter = Reporter.CreateReporter();
                 if (reporter != null)
                 {
@@ -276,6 +283,40 @@ namespace ScenarioMeasurement
                 string min = $"{counter.Results.Min():F3} {counter.MetricName}";
                 logger.Log($"{counter.Name,-15}|{average,-15}|{min,-15}|{max,-15}");
             }
+        }
+
+        private static void WriteToCSV(string scenario, string csv, IEnumerable<Counter> counters)
+        {
+
+            string line = "";
+            foreach (var counter in counters)
+            {
+                if (counter.Name == "Process Time")
+                {
+                    string average = $"{counter.Results.Average():F3}";
+                    string max = $"{counter.Results.Max():F3}";
+                    string min = $"{counter.Results.Min():F3}";
+                    string stdev = $"{GetStdev(counter.Results):F3}";
+                    line = $"{scenario},{average},{stdev},{min},{max},";
+                    line = line + "---,";
+                    foreach (double result in counter.Results)
+                    {
+                        line = line + result + ",";
+                    }
+                    break;
+                }
+            }
+
+            using (StreamWriter file = new StreamWriter(csv, append: true))
+            {
+                file.WriteLine(line);
+            }
+        }
+
+        private static double GetStdev(IList<double> numbers)
+        {
+            double avg = numbers.Average();
+            return Math.Sqrt(numbers.Average(v => Math.Pow(v - avg, 2)));
         }
     }
 }
