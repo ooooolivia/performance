@@ -242,7 +242,7 @@ namespace ScenarioMeasurement
 
         }
 
-        private static ProcessHelper CreateProcHelper(string command, string args, string workingDir, Logger logger)
+        private static ProcessHelper CreateProcHelper(string command, string args, Logger logger)
         {
             var procHelper = new ProcessHelper(logger)
             {
