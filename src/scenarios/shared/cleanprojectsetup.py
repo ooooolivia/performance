@@ -1,21 +1,29 @@
+'''
+Iteration setup script for clean build
+'''
+
 from shutil import copytree, rmtree
 import os
 from shared import const
-from logging import getLogger
 import sys
 import dotnet
+from performance.logger import setup_loggers
+from logging import getLogger
 
 
 # prerequisite: the asset has been copied to tmp in pre.py
 def main():
-    sys.stdout.write("Shutting down dotnet servers...\n")
+
+    setup_loggers(verbose=True)
+
+    getLogger().info("Shutting down dotnet servers...")
     dotnet.shutdown_server(verbose=True)
 
-    sys.stdout.write("Cleaning project folder...\n")
+    getLogger().info("Cleaning project folder...")
     tmp = os.path.join(const.TMPDIR, const.APPDIR)
     # check if a copy exists before deleting the folder
     if not os.path.isdir(tmp):
-        sys.stderr.write("Please run pre.py to copy the asset first.\n")
+        getLogger().error("Please run pre.py to copy the asset first.")
         sys.exit(1)
     rmtree(const.APPDIR)
     copytree(tmp, const.APPDIR)

@@ -3,13 +3,18 @@ Module for running scenario tasks
 '''
 
 import sys
+import os
 from logging import getLogger
 from collections import namedtuple
 from argparse import ArgumentParser
+
+import shared
 from shared.startup import StartupWrapper
 from shared.util import publishedexe
 from shared import const
 from performance.logger import setup_loggers
+
+ITERATION_SETUP_FILE = 'cleanprojectsetup.py'
 
 reqfields = ('scenarioname',
              'exename')
@@ -17,10 +22,7 @@ optfields = ('guiapp',
              'startupmetric',
              'appargs',
              'iterations',
-             'timeout',
-             # 'warmup',
-             # 'iterationsetup',
-             # 'setupargs',
+             'timeout'
              )
 
 # These are the kinds of scenarios we run. Default here indicates whether ALL
@@ -31,6 +33,7 @@ testtypes = {const.STARTUP: True,
 TestTraits = namedtuple('TestTraits', 
                         reqfields + tuple(testtypes.keys()) + optfields,
                         defaults=tuple(testtypes.values()) + (None,) * len(optfields))
+
 
 
 class Runner:
@@ -80,7 +83,7 @@ class Runner:
                              scenariotypename='%s (%s)' % (const.SDK, const.BUILD_CLEAN),
                              apptorun=self.traits.exename,
                              iterationsetup=const.PYTHON,
-                             setupargs='..\\shared\\cleanprojectsetup.py'
+                             setupargs=os.path.join(os.path.dirname(shared.__file__), ITERATION_SETUP_FILE)
                              )
 
             startup.runtests(scenarioname=self.traits.scenarioname,
