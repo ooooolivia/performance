@@ -1,6 +1,8 @@
 # Other folders to ignore
 **/logs/
 /tools/
+traces/
+tmp/
 
 # Python files
 **/.pytest_cache/
