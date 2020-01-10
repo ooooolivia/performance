@@ -206,7 +206,7 @@ jobs:
 # Private Jobs
 ###########################################
 
-- ${{ if and(ne(variables['System.TeamProject'], 'public'), notin(variables['Build.Reason'], 'PullRequest')) }}:
+- ${{ if and(ne(variables['System.TeamProject'], 'public'), in(variables['Build.Reason'], 'IndividualCI')) }}:
 
   # Windows x64 scenario benchmarks
   - template: /eng/performance/scenarios.yml
@@ -493,4 +493,5 @@ jobs:
       queue: Windows.10.Amd64.19H1.Tiger.Perf
       projectFile: sdk_scenarios.proj
       channels:
-        - $(channel) # for manual runs we can specify channel variable 
+        - $(manual_channel) # for manual runs we can specify channel variable 
+        - variables['manual_channel']
