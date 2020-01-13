@@ -494,4 +494,3 @@ jobs:
       projectFile: sdk_scenarios.proj
       channels:
         - $(manual_channel) # for manual runs we can specify channel variable 
-        - variables['manual_channel']
