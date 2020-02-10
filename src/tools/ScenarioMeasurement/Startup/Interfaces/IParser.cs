@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Reporting;
 
-namespace ScenarioMeasurement
+namespace Interfaces
 {
     internal interface IParser
     {
