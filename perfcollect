@@ -607,6 +607,11 @@ declare -a DotNETRuntimePrivate_DynamicTypeUsageKeyword=(
     DotNETRuntimePrivate:ObjectVariantMarshallingToManaged
 )
 
+declare -a Kernel_Default=(
+    sched_process_exec
+    sched_process_exit
+)
+
 ######################################
 ## Global Variables
 ######################################
@@ -636,6 +641,9 @@ logEnabled=1
 
 # Temp directory name
 collectTempDir='temp'
+
+# Temp trace directory
+collectInfoFile='collectinfo'
 
 ######################################
 ## Logging Functions
@@ -1301,8 +1309,6 @@ CreateLTTngSession()
 
     lttngSessionName=`echo $output | grep -o "Session.*created." | sed 's/\(Session \| created.\)//g'`
     lttngTraceDir=`echo $output | grep -o "Traces.*" | sed 's/\(Traces will be written in \|\)//g'`
-    echo "session name: $lttngSessionName"
-    echo "trace dir: $lttngTraceDir"
 }
 
 SetupLTTngSession()
@@ -1312,52 +1318,55 @@ SetupLTTngSession()
     # RunSilent "lttng add-context --userspace --type vtid"
     # RunSilent "lttng add-context --userspace --type procname"
 
-    RunSilent "lttng enable-event --kernel sched_switch,sched_process_fork"
-
-    # if [ "$action" == "livetrace" ]
-    # then
-    #     RunSilent "lttng enable-event --userspace --tracepoint DotNETRuntime:EventSource"
-    # elif [ "$gcCollectOnly" == "1" ]
-    # then
-    #     usePerf=0
-    #     EnableLTTngEvents ${DotNETRuntime_GCKeyword_GCCollectOnly[@]}
-    #     EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly[@]}
-    #     EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
-    # elif [ "$gcOnly" == "1" ]
-    # then
-    #     usePerf=0
-    #     EnableLTTngEvents ${DotNETRuntime_GCKeyword[@]}
-    #     EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword[@]}
-    #     EnableLTTngEvents ${DotNETRuntime_JitKeyword[@]}
-    #     EnableLTTngEvents ${DotNETRuntime_LoaderKeyword[@]}
-    #     EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
-    # elif [ "$gcWithHeap" == "1" ]
-    # then
-    #     usePerf=0
-    #     EnableLTTngEvents ${DotNETRuntime_GCKeyword[@]}
-    #     EnableLTTngEvents ${DotNETRuntime_GCHeapSurvivalAndMovementKeyword[@]}
-    # else
-    #     if [ "$events" == "" ]
-    #     then
-    #         # Enable the default set of events.
-    #         EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword_ThreadTransferKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_NoKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_ContentionKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_JitKeyword_NGenKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_JitKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_LoaderKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_GCKeyword_GCCollectOnly[@]}
-    #         EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly[@]}
-    #         EnableLTTngEvents ${DotNETRuntimePrivate_BindingKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntimePrivate_MulticoreJitPrivateKeyword[@]}
-    #         EnableLTTngEvents ${DotNETRuntime_CompilationKeyword[@]}
-    #     elif [ "$events" == "threading" ]
-    #     then
-    #         EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
-    #     fi
-    # fi
+    if [ "$action" == "livetrace" ]
+    then
+        RunSilent "lttng enable-event --userspace --tracepoint DotNETRuntime:EventSource"
+    elif [ "$gcCollectOnly" == "1" ]
+    then
+        usePerf=0
+        EnableLTTngEvents ${DotNETRuntime_GCKeyword_GCCollectOnly[@]}
+        EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly[@]}
+        EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
+    elif [ "$gcOnly" == "1" ]
+    then
+        usePerf=0
+        EnableLTTngEvents ${DotNETRuntime_GCKeyword[@]}
+        EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword[@]}
+        EnableLTTngEvents ${DotNETRuntime_JitKeyword[@]}
+        EnableLTTngEvents ${DotNETRuntime_LoaderKeyword[@]}
+        EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
+    elif [ "$gcWithHeap" == "1" ]
+    then
+        usePerf=0
+        EnableLTTngEvents ${DotNETRuntime_GCKeyword[@]}
+        EnableLTTngEvents ${DotNETRuntime_GCHeapSurvivalAndMovementKeyword[@]}
+    else
+        if [ "$events" == "" ]
+        then
+            # # Enable the default set of events.
+            # EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword_ThreadTransferKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_NoKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_ContentionKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_JitKeyword_NGenKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_JitKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_LoaderKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_GCKeyword_GCCollectOnly[@]}
+            # EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly[@]}
+            # EnableLTTngEvents ${DotNETRuntimePrivate_BindingKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntimePrivate_MulticoreJitPrivateKeyword[@]}
+            # EnableLTTngEvents ${DotNETRuntime_CompilationKeyword[@]}
+            WriteStatus "No event enabled."
+        elif [ "$events" == "threading" ]
+        then
+            EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
+        elif [ "$events" == "kernel" ]
+        then 
+            RunSilent "lttng add-context --kernel -t pid -t procname"
+            EnableLTTngKernelEvents ${Kernel_Default[@]}
+        fi
+    fi
 }
 
 DestroyLTTngSession()
@@ -1390,6 +1399,15 @@ EnableLTTngEvents()
     done
 }
 
+EnableLTTngKernelEvents()
+{
+    args=( "$@" )
+    for (( i=0; i<${#args[@]}; i++ ))
+    do 
+        RunSilent "lttng enable-event -s $lttngSessionName -k ${args[$i]}"
+    done
+}
+
 ##
 # Helper that processes collected data.
 # This helper is called when the CTRL+C signal is handled.
@@ -1412,8 +1430,6 @@ ProcessCollectedData()
             RunSilent "mkdir lttngTrace"
             RunSilent "cp -r $lttngTraceDir lttngTrace"
         fi
-        echo "----lttngTrace"
-        ls lttngTrace
     fi
 
     if [ "$usePerf" == 1 ]
@@ -1658,6 +1674,7 @@ EndCollect()
 {
     # Change to temp directory.
     cd $collectTempDir
+    source $collectInfoFile
     echo "session name: $lttngSessionName"
     echo "trace directory: $lttngTraceDir"
     if [ "$useLTTng" == "1" ]
@@ -1832,7 +1849,7 @@ DoCollect()
     #     done
     fi
     #EndCollect
-    #declare -p | grep -e lttngTraceDir -e lttngSessionName > $collectVariablesFile
+    declare -p | grep -e lttngTraceDir -e lttngSessionName > $collectInfoFile
 }
 
 DoLiveTrace()
