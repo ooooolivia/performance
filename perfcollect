@@ -620,7 +620,7 @@ declare -a Kernel_Default=(
 declare -a eventsToCollect
 
 # Use Perf_Event
-usePerf=0
+usePerf=1
 
 # Use LTTng
 useLTTng=1
@@ -639,10 +639,7 @@ declare logFile
 logFilePrefix='/tmp/perfcollect'
 logEnabled=1
 
-# Temp directory name
-collectTempDir='temp'
-
-# Temp trace directory
+# Collect info to pass between processes
 collectInfoFile='collectinfo'
 
 ######################################
@@ -658,17 +655,14 @@ LogAppend()
 
 RunSilent()
 {
-    echo "Running \"$*\""
-    $*
-    echo ""
-    # if (( $logEnabled == 1 ))
-    # then
-    #     echo "Running \"$*\"" >> $logFile
-    #     $* >> $logFile 2>&1
-    #     echo "" >> $logFile
-    # else
-    #     $* > /dev/null 2>&1
-    # fi
+    if (( $logEnabled == 1 ))
+    then
+        echo "Running \"$*\"" >> $logFile
+        $* >> $logFile 2>&1
+        echo "" >> $logFile
+    else
+        $* > /dev/null 2>&1
+    fi
 }
 
 InitializeLog()
@@ -1189,27 +1183,27 @@ ProcessArguments()
     # Validate operation name.
     if [ "$action" == "collect" ]
     then
-        operation=$2
-        shift
-        if [ "$operation" != "start" ] && [ "$operation" != "stop" ]
-        then
-            FatalError "Invalid operation specified."
+        if [ "$2" == "start" ] || [ "$2" == "stop" ] 
+        then 
+            operation=$2
+            shift
         fi
     fi
 
-    #echo "action: $action"
-    #echo "operation: $operation"
+    # echo "action: $action"
+    # echo "operation: $operation"
 
     # Set the data file.
     inputTraceName=$2
-    if [ "$inputTraceName" == "" ]
+    echo $inputTraceName
+    if [ "$inputTraceName" == "" ] 
     then
         FatalError "Invalid trace name specified."
     fi
-    
+
     args=( "$@" )
-    #echo inputTraceName: $inputTraceName#
-    #exit
+    # echo inputTraceName: $inputTraceName
+    # exit
 
     # Process remaining arguments.
     # First copy the args into an array so that we can walk the array.
@@ -1267,6 +1261,9 @@ ProcessArguments()
         elif [ "-nolttng" == "$arg" ]
         then
             useLTTng=0
+        elif [ "-noperf" == "$arg" ]
+        then 
+            usePerf=0
         elif [ "-gccollectonly" == "$arg" ]
         then
             gcCollectOnly=1
@@ -1313,58 +1310,61 @@ CreateLTTngSession()
 
 SetupLTTngSession()
 {
-    # # Setup per-event context information.
-    # RunSilent "lttng add-context --userspace --type vpid"
-    # RunSilent "lttng add-context --userspace --type vtid"
-    # RunSilent "lttng add-context --userspace --type procname"
-
-    if [ "$action" == "livetrace" ]
+    # Setup kernel events. 
+    # TODO: enable triggers of different kernel events, instead of a default set of kernel events
+    if [ "$events" == "kernel" ]
     then
-        RunSilent "lttng enable-event --userspace --tracepoint DotNETRuntime:EventSource"
-    elif [ "$gcCollectOnly" == "1" ]
-    then
-        usePerf=0
-        EnableLTTngEvents ${DotNETRuntime_GCKeyword_GCCollectOnly[@]}
-        EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly[@]}
-        EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
-    elif [ "$gcOnly" == "1" ]
-    then
-        usePerf=0
-        EnableLTTngEvents ${DotNETRuntime_GCKeyword[@]}
-        EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword[@]}
-        EnableLTTngEvents ${DotNETRuntime_JitKeyword[@]}
-        EnableLTTngEvents ${DotNETRuntime_LoaderKeyword[@]}
-        EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
-    elif [ "$gcWithHeap" == "1" ]
-    then
-        usePerf=0
-        EnableLTTngEvents ${DotNETRuntime_GCKeyword[@]}
-        EnableLTTngEvents ${DotNETRuntime_GCHeapSurvivalAndMovementKeyword[@]}
+        RunSilent "lttng add-context --kernel -t pid -t procname"
+        EnableLTTngKernelEvents ${Kernel_Default[@]}
     else
-        if [ "$events" == "" ]
+        # Setup per-event context information.
+        RunSilent "lttng add-context --userspace --type vpid"
+        RunSilent "lttng add-context --userspace --type vtid"
+        RunSilent "lttng add-context --userspace --type procname"
+
+        if [ "$action" == "livetrace" ]
         then
-            # # Enable the default set of events.
-            # EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword_ThreadTransferKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_NoKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_ContentionKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_JitKeyword_NGenKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_JitKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_LoaderKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_GCKeyword_GCCollectOnly[@]}
-            # EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly[@]}
-            # EnableLTTngEvents ${DotNETRuntimePrivate_BindingKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntimePrivate_MulticoreJitPrivateKeyword[@]}
-            # EnableLTTngEvents ${DotNETRuntime_CompilationKeyword[@]}
-            WriteStatus "No event enabled."
-        elif [ "$events" == "threading" ]
+            RunSilent "lttng enable-event --userspace --tracepoint DotNETRuntime:EventSource"
+        elif [ "$gcCollectOnly" == "1" ]
         then
-            EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
-        elif [ "$events" == "kernel" ]
-        then 
-            RunSilent "lttng add-context --kernel -t pid -t procname"
-            EnableLTTngKernelEvents ${Kernel_Default[@]}
+            usePerf=0
+            EnableLTTngEvents ${DotNETRuntime_GCKeyword_GCCollectOnly[@]}
+            EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly[@]}
+            EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
+        elif [ "$gcOnly" == "1" ]
+        then
+            usePerf=0
+            EnableLTTngEvents ${DotNETRuntime_GCKeyword[@]}
+            EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword[@]}
+            EnableLTTngEvents ${DotNETRuntime_JitKeyword[@]}
+            EnableLTTngEvents ${DotNETRuntime_LoaderKeyword[@]}
+            EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
+        elif [ "$gcWithHeap" == "1" ]
+        then
+            usePerf=0
+            EnableLTTngEvents ${DotNETRuntime_GCKeyword[@]}
+            EnableLTTngEvents ${DotNETRuntime_GCHeapSurvivalAndMovementKeyword[@]}
+        else
+            if [ "$events" == "" ]
+            then
+                # Enable the default set of events.
+                EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword_ThreadTransferKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_NoKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_ExceptionKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_ContentionKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_JitKeyword_NGenKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_JitKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_LoaderKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_GCKeyword_GCCollectOnly[@]}
+                EnableLTTngEvents ${DotNETRuntimePrivate_GCPrivateKeyword_GCCollectOnly[@]}
+                EnableLTTngEvents ${DotNETRuntimePrivate_BindingKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntimePrivate_MulticoreJitPrivateKeyword[@]}
+                EnableLTTngEvents ${DotNETRuntime_CompilationKeyword[@]}
+            elif [ "$events" == "threading" ]
+            then
+                EnableLTTngEvents ${DotNETRuntime_ThreadingKeyword[@]}
+            fi
         fi
     fi
 }
@@ -1420,7 +1420,6 @@ ProcessCollectedData()
     local directoryName=$traceName$traceSuffix
     mkdir $directoryName
 
-    # Save LTTng trace files.
     if [ "$useLTTng" == "1" ]
     then
         LogAppend "Saving LTTng trace files."
@@ -1642,17 +1641,17 @@ ProcessCollectedData()
     RunSilent "$zipcmd -r $archiveName $directoryName"
 
     # Move back to the original directory.
-    cd ..
+    popd > /dev/null
 
     # Move the archive.
-    RunSilent "mv $collectTempDir/$archiveName ."
+    RunSilent "mv $tempDir/$archiveName ."
 
     WriteStatus "...FINISHED"
 
     WriteStatus "Cleaning up artifacts"
 
     # Delete the temp directory.
-    RunSilent "rm -rf $collectTempDir"
+    RunSilent "rm -rf $tempDir $collectInfoFile"
 
     WriteStatus "...FINISHED"
 
@@ -1672,11 +1671,15 @@ CTRLC_Handler()
 
 EndCollect()
 {
-    # Change to temp directory.
-    cd $collectTempDir
-    source $collectInfoFile
-    echo "session name: $lttngSessionName"
-    echo "trace directory: $lttngTraceDir"
+    # The user must either use "collect stop" or CTRL+C to stop collection.
+    if [ "$operation" == "stop" ]
+    then 
+        # Recover trace info in the previous program.
+        source $collectInfoFile  # TODO: exit and dispose upon missing file
+        # New program started, so go back to the temp directory.
+        pushd $tempDir > /dev/null
+    fi
+
     if [ "$useLTTng" == "1" ]
     then
         StopLTTngCollection
@@ -1689,7 +1692,7 @@ EndCollect()
     WriteStatus "Starting post-processing.  This may take some time."
     WriteStatus
 
-    # The user must CTRL+C to stop collection.
+    # The user used CTRL+C to stop collection.
     # When this happens, we catch the signal and finish our work.
     ProcessCollectedData
 }
@@ -1800,20 +1803,17 @@ DoCollect()
     trap CTRLC_Handler SIGINT
 
     # Create a temp directory to use for collection.
-    mkdir $collectTempDir
-    LogAppend "Created temp directory $collectTempDir"
+    local tempDir=`mktemp -d`
+    LogAppend "Created temp directory $tempDir"
 
     # Switch to the directory.
-    cd $collectTempDir
+    pushd $tempDir > /dev/null
 
     # Start LTTng collection.
     if [ "$useLTTng" == "1" ]
     then
         StartLTTngCollection
     fi
-
-    # For tracing of startup tool, we only support calling "./perfcollect collect start" to start tracing and
-    # "./perfcollect collect stop" to stop tracing. We also assume duration is not set. 
 
     # Tell the user that collection has started and how to exit.
     if [ "$duration" != "" ]
@@ -1827,29 +1827,34 @@ DoCollect()
     if [ "$usePerf" == "1" ]
     then
         RunSilent $perfcmd $collectionArgs
-    # else
-    #     # Wait here until CTRL+C handler gets called when user types CTRL+C.
-    #     LogAppend "Waiting for CTRL+C handler to get called."
+    elif [ "$operation" == "start" ]
+    then 
+        # Pass trace directory and session name to the stop process.
+        popd > /dev/null
+        declare -p | grep -e lttngTraceDir -e lttngSessionName -e tempDir -e usePerf -e useLttng > $collectInfoFile
+    else
+        # Wait here until CTRL+C handler gets called when user types CTRL+C.
+        LogAppend "Waiting for CTRL+C handler to get called."
 
-    #     waitTime=0
-    #     for (( ; ; ))
-    #     do
-    #         if [ "$handlerInvoked" == "1" ]
-    #         then
-    #             break;
-    #         fi
+        waitTime=0
+        for (( ; ; ))
+        do
+            if [ "$handlerInvoked" == "1" ]
+            then
+                break;
+            fi
 
-    #         # Wait and then check to see if the handler has been invoked or we've crossed the duration threshold.
-    #         sleep 1
-    #         waitTime=$waitTime+1
-    #         if (( duration > 0 && duration <= waitTime ))
-    #         then
-    #             break;
-    #         fi
-    #     done
+            # Wait and then check to see if the handler has been invoked or we've crossed the duration threshold.
+            sleep 1
+            waitTime=$waitTime+1
+            if (( duration > 0 && duration <= waitTime ))
+            then
+                break;
+            fi
+        done
+        # End collection if no operation is set.
+        EndCollect
     fi
-    #EndCollect
-    declare -p | grep -e lttngTraceDir -e lttngSessionName > $collectInfoFile
 }
 
 DoLiveTrace()
@@ -1959,7 +1964,7 @@ ProcessArguments $@
 # Take the appropriate action.
 if [ "$action" == "collect" ]
 then
-    if [ "$operation" == "start" ]
+    if [ "$operation" == "start" ] || [ -z "$operation" ]
     then
         DoCollect
     elif [ "$operation" == "stop" ]
