@@ -1,26 +1,44 @@
-if [[ -z $1 ]]; then
-    echo "Please specify a channel to download dotnet from; example: ./init.sh <channel>"
-    exit 1
+# Add scripts and current directory to PYTHONPATH
+absolutePath="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+scriptPath="$absolutePath/../../scripts"
+export PYTHONPATH=$PYTHONPATH:$scriptPath:$absolutePath
+
+# Parse arguments
+if [ "$1" == "-dotnetdir" ]
+then
+    dotnetDirectory="$2"
+elif [ "$1" == "-installdotnetfromchannel" ]
+then
+    channel="$2"
 fi
 
-ABSOLUTE_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SCRIPT_PATH="$ABSOLUTE_PATH/../../scripts"
-export PYTHONPATH=$PYTHONPATH:$SCRIPT_PATH:$ABSOLUTE_PATH
-DOTNET_SCRIPT="$SCRIPT_PATH/dotnet.py"
-DOTNET_DIRECTORY="$ABSOLUTE_PATH/dotnet"
-
-if [[ -d $DOTNET_DIRECTORY ]]; then
-    echo "Removing $DOTNET_DIRECTORY"
-    rm -r $DOTNET_DIRECTORY
+# Download dotnet from the specified channel
+if [ "$channel" != "" ]
+then
+    installDirectory="$absolutePath/dotnet"
+    # Remove existing dotnet directory to make sure we only have one version of dotnet 
+    if [ -d "$installDirectory" ]
+    then
+        echo "Removing $installDirectory"
+        rm -r $installDirectory
+    fi
+    dotnetScript="$scriptPath/dotnet.py"
+    echo "Downloading dotnet from channel $channel"
+    python $dotnetScript install --channels $channel --install-dir $installDirectory
 fi
 
-echo "Downloading dotnet from channel $1"
-python $DOTNET_SCRIPT install --channels $1 --install-dir $DOTNET_DIRECTORY
+if [ "$dotnetDirectory" != "" ]
+then
+    export DOTNET_ROOT=$dotnetDirectory
+    export PATH="$dotnetDirectory:$PATH"
+elif [ "$installDirectory" != "" ]
+then
+    export DOTNET_ROOT=$installDirectory
+    export PATH="$installDirectory:$PATH"
+fi
 
 export DOTNET_CLI_TELEMETRY_OPTOUT='1'
 export DOTNET_MULTILEVEL_LOOKUP='0'
 export UseSharedCompilation='false'
-export DOTNET_ROOT=$DOTNET_DIRECTORY
-export PATH="$DOTNET_DIRECTORY:$PATH"
 
 dotnet --info
