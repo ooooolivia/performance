@@ -3,6 +3,8 @@ absolutePath="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 scriptPath="$absolutePath/../../scripts"
 export PYTHONPATH=$PYTHONPATH:$scriptPath:$absolutePath
 
+dotnetDirectory=""
+channel=""
 # Parse arguments
 if [ "$1" == "-dotnetdir" ]
 then
@@ -24,7 +26,8 @@ then
     fi
     dotnetScript="$scriptPath/dotnet.py"
     echo "Downloading dotnet from channel $channel"
-    python $dotnetScript install --channels $channel --install-dir $installDirectory
+    echo installDir: $installDirectory
+    python3 $dotnetScript install --channels $channel --install-dir $installDirectory
 fi
 
 if [ "$dotnetDirectory" != "" ]
