@@ -21,7 +21,7 @@ namespace Startup
             perfcollectProcess = new ProcessHelper(logger)
             {
                 ProcessWillExit = true,
-                Executable = "sudo",
+                Executable = filepath,
                 Timeout = 300
             };
 
@@ -35,7 +35,7 @@ namespace Startup
 
         public void Install()
         {
-            perfcollectProcess.Arguments = $"{filepath} install";
+            perfcollectProcess.Arguments = "install";
             var runResult = perfcollectProcess.Run();
         }
     }
