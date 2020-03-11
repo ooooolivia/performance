@@ -35,7 +35,7 @@ namespace Startup
 
         public void Install()
         {
-            perfcollectProcess.Arguments = $"./{filepath} install";
+            perfcollectProcess.Arguments = $"{filepath} install";
             var runResult = perfcollectProcess.Run();
         }
     }
