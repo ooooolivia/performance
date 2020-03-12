@@ -63,6 +63,7 @@ namespace Startup
             }
 
             perfcollectProcess.Arguments = arguments;
+            Console.WriteLine($"arguments: {perfcollectProcess.Arguments}");
             return perfcollectProcess.Run().Result;
         }
 
