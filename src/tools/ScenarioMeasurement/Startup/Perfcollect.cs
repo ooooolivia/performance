@@ -26,7 +26,7 @@ namespace Startup
 
             if (String.IsNullOrEmpty(traceName))
             {
-                throw new ArgumentException(traceName);
+                throw new ArgumentException("Trace file name cannot be empty.");
             }
 
             perfcollectProcess = new ProcessHelper(logger)
