@@ -1,6 +1,7 @@
 ﻿using System;
 using Startup;
 using ScenarioMeasurement;
+using System.Diagnostics;
 
 namespace PerfcollectTest
 {
@@ -10,8 +11,22 @@ namespace PerfcollectTest
         {
             Perfcollect perfcollect = new Perfcollect("wrapper-kernel-1", new Logger("name.log"));
             perfcollect.Events = Perfcollect.EventOptions.ProcessLifetime;
-            var result = perfcollect.Start();
-            Console.WriteLine(result);
+            var startResult = perfcollect.Start();
+            RunTest();
+            var stopResult = perfcollect.Stop();
+        }
+
+        static void RunTest()
+        {
+            var startInfo = new ProcessStartInfo();
+            startInfo.FileName = "python3";
+            startInfo.Arguments = "--version";
+            var testProcess = new Process();
+            testProcess.StartInfo = startInfo;
+            testProcess.Start();
+            Console.WriteLine("test process started.");
+            testProcess.WaitForExit();
+            Console.WriteLine("test process end.");
         }
     }
 }
