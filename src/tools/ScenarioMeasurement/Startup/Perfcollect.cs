@@ -19,6 +19,7 @@ namespace Startup
 
         public Perfcollect(string traceName, Logger logger)
         {
+            TraceName = traceName;
             if (!File.Exists(filepath))
             {
                 throw new FileNotFoundException($"Pefcollect not found at {filepath}. Please rebuild the project to download it.");
