@@ -8,7 +8,8 @@ namespace PerfcollectTest
     {
         static void Main(string[] args)
         {
-            Perfcollect percollect = new Perfcollect(new Logger("name.log"));
+            Perfcollect percollect = new Perfcollect("", new Logger("name.log"));
+            
         }
     }
 }
