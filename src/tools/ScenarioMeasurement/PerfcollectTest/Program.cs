@@ -8,8 +8,9 @@ namespace PerfcollectTest
     {
         static void Main(string[] args)
         {
-            Perfcollect percollect = new Perfcollect("", new Logger("name.log"));
-            
+            Perfcollect perfcollect = new Perfcollect("", new Logger("name.log"));
+            perfcollect.Events = Perfcollect.EventOptions.ProcessLifetime;
+            var result = perfcollect.Start();
         }
     }
 }
