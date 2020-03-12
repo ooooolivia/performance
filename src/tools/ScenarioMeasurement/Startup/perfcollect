@@ -624,6 +624,9 @@ declare -a LTTng_Kernel_ProcessLifetime=(
 ## Global Variables
 ######################################
 
+# Install without waiting for standard input
+quietInstall=0
+
 # Declare an array of events to collect.
 declare -a eventsToCollect
 
@@ -1295,7 +1298,7 @@ CreateLTTngSession()
     fi
 
     lttngSessionName=`echo $output | grep -o "Session.*created." | sed 's/\(Session \| created.\)//g'`
-    lttngTraceDir=`echo $output | grep -o "Traces.*" | sed 's/\(Traces will be written in \|\)//g'`
+    lttngTraceDir=`echo $output | grep -o "Traces.*" | sed 's/\(Traces will be written in \|\)//g' | sed 's/\(Traces will be output to \|\)//g'`
 }
 
 SetupLTTngSession()
@@ -1949,6 +1952,11 @@ DoView()
 # Install perf if requested.  Do this before all other validation.
 if [ "$1" == "install" ]
 then
+    if [ "$2" == "-quiet" ]
+    then 
+        quietInstall = 1
+        echo "quiet install enabled"
+    fi
     InstallPerf
     InstallLTTng
     exit 0
