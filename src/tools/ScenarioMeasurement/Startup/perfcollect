@@ -1295,7 +1295,7 @@ CreateLTTngSession()
     fi
 
     lttngSessionName=`echo $output | grep -o "Session.*created." | sed 's/\(Session \| created.\)//g'`
-    lttngTraceDir=`echo $output | grep -o "Traces.*" | sed 's/\(Traces will be written in \|\)//g'`
+    lttngTraceDir=`echo $output | grep -o "Traces.*" | sed 's/\(Traces will be written in \|\)//g' | sed 's/\(Traces will be output to \|\)//g'`
 }
 
 SetupLTTngSession()
