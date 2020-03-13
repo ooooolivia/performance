@@ -11,13 +11,18 @@ using System.Text;
 namespace Startup
 {
     public class Perfcollect
-    {   
+    {
         private readonly string filepath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, @"Startup/perfcollect");
         private ProcessHelper perfcollectProcess;
         public string TraceName { get; private set; }
+        public string TraceDirectory { get; private set; }
         public EventOptions Events { get; set; } = EventOptions.Empty;
 
-        public Perfcollect(string traceName, Logger logger)
+        public Perfcollect(string traceName, Logger logger) : this (traceName, Environment.CurrentDirectory, logger)
+        {
+        }
+
+        public Perfcollect(string traceName, string traceDirectory, Logger logger)
         {
             TraceName = traceName;
             if (!File.Exists(filepath))
@@ -29,6 +34,14 @@ namespace Startup
             {
                 throw new ArgumentException("Trace file name cannot be empty.");
             }
+
+
+            if (!Directory.Exists(traceDirectory))
+            {
+                Directory.CreateDirectory(traceDirectory);
+            }
+            TraceDirectory = traceDirectory;
+            
 
             perfcollectProcess = new ProcessHelper(logger)
             {
@@ -72,12 +85,20 @@ namespace Startup
         {
             string arguments = $"stop {TraceName} ";
             perfcollectProcess.Arguments = arguments;
-            return perfcollectProcess.Run().Result;
+            var result = perfcollectProcess.Run().Result;
+
+            string traceFile = $"{TraceName}.trace.zip";
+            if (!File.Exists(traceFile))
+            {
+                throw new FileNotFoundException("Trace file not found.");
+            }
+            File.Move(traceFile, Path.Combine(TraceDirectory, traceFile));
+            return result;
         }
 
         public ProcessHelper.Result Install()
         {
-            perfcollectProcess.Arguments = "install";
+            perfcollectProcess.Arguments = "install -force";
             return perfcollectProcess.Run().Result;
         }
 
