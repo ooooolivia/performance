@@ -9,7 +9,7 @@ namespace PerfcollectTest
     {
         static void Main(string[] args)
         {
-            Perfcollect perfcollect = new Perfcollect("wrapper-kernel-2", new Logger("name.log"));
+            Perfcollect perfcollect = new Perfcollect("wrapper-kernel-3", "trace", new Logger("name.log"));
             perfcollect.Events = Perfcollect.EventOptions.ProcessLifetime;
             var startResult = perfcollect.Start();
             RunTest();
