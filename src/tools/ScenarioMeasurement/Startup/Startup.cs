@@ -129,7 +129,7 @@ namespace ScenarioMeasurement
             // Warm up iteration
             if (warmup)
             {
-                logger.LogHeader1("Warm up");
+                logger.LogIterationHeader("Warm up");
                 if (!RunIteration(setupProcHelper, procHelper, cleanupProcHelper, logger).Success)
                 {
                     return -1;  
@@ -162,7 +162,7 @@ namespace ScenarioMeasurement
                 traceSession.EnableProviders(parser);
                 for (int i = 0; i < iterations; i++)
                 {
-                    logger.LogHeader1($"Iteration {i}");
+                    logger.LogIterationHeader($"Iteration {i}");
                     var iterationResult = RunIteration(setupProcHelper, procHelper, cleanupProcHelper, logger);
                     if (!iterationResult.Success)
                     {
@@ -198,7 +198,7 @@ namespace ScenarioMeasurement
             // Run profile session
             if (!failed && !skipProfileIteration)
             {
-                logger.LogHeader1("Profile Iteration");
+                logger.LogIterationHeader("Profile Iteration");
                 ProfileParser profiler = new ProfileParser(parser);
                 using (var profileSession = TraceSessionManager.CreateProfileSession("ProfileSession", "profile_"+traceFileName, traceDirectory, logger))
                 {
@@ -243,14 +243,14 @@ namespace ScenarioMeasurement
             int pid = 0;
             if (setupHelper != null)
             {
-                logger.LogHeader2("Iteration Setup");
+                logger.LogStepHeader("Iteration Setup");
                 failed = !RunProcess(setupHelper).Success;
             }
 
             // no need to run test process if setup failed
             if (!failed)
             {
-                logger.LogHeader2("Test");
+                logger.LogStepHeader("Test");
                 var testProcessResult = RunProcess(testHelper);
                 failed = !testProcessResult.Success;
                 pid = testProcessResult.Pid;
@@ -259,7 +259,7 @@ namespace ScenarioMeasurement
             // need to clean up despite the result of setup and test
             if (cleanupHelper != null)
             {
-                logger.LogHeader2("Iteration Cleanup");
+                logger.LogStepHeader("Iteration Cleanup");
                 failed = failed || !RunProcess(cleanupHelper).Success;
             }
 

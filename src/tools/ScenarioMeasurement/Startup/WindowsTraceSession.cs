@@ -13,10 +13,11 @@ namespace ScenarioMeasurement
         private Logger logger;
         private string traceName;
         private string traceDirectory;
+        private string traceFilePath;
         public TraceEventSession KernelSession { get; set; }
         public TraceEventSession UserSession { get; set; }
-        private Dictionary<TraceSessionManager.KernelKeyword, KernelTraceEventParser.Keywords> winKwMapKernel;
-        private Dictionary<TraceSessionManager.ClrKeyword, ClrPrivateTraceEventParser.Keywords> winKwMapClr;
+        private Dictionary<TraceSessionManager.KernelKeyword, KernelTraceEventParser.Keywords> kernelKeywords;
+        private Dictionary<TraceSessionManager.ClrKeyword, ClrPrivateTraceEventParser.Keywords> clrKeywords;
 
         public WindowsTraceSession(string sessionName, string traceName, string traceDirectory, Logger logger)
         {
@@ -67,6 +68,7 @@ namespace ScenarioMeasurement
                 TraceEventSession.Merge(files.ToArray(), traceFile);
                 if (File.Exists(traceFile))
                 {
+                    traceFilePath = traceFile;
                     File.Delete(userTraceFile);
                     File.Delete(kernelTraceFile);
                 }
@@ -79,7 +81,7 @@ namespace ScenarioMeasurement
             KernelTraceEventParser.Keywords flags = 0;
             foreach (var keyword in keywords)
             {
-                flags |= winKwMapKernel[keyword];
+                flags |= kernelKeywords[keyword];
             }
             KernelSession.EnableKernelProvider(flags);
         }
@@ -90,7 +92,7 @@ namespace ScenarioMeasurement
             ClrPrivateTraceEventParser.Keywords flags = 0;
             foreach (var keyword in keywords)
             {
-                flags |= winKwMapClr[keyword];
+                flags |= clrKeywords[keyword];
             }
             UserSession.EnableProvider(ClrPrivateTraceEventParser.ProviderGuid, TraceEventLevel.Verbose, (ulong)flags);
         }
@@ -98,19 +100,24 @@ namespace ScenarioMeasurement
         private void InitWindowsKeywordMaps()
         {
             // initialize windows kernel keyword map
-            winKwMapKernel = new Dictionary<TraceSessionManager.KernelKeyword, KernelTraceEventParser.Keywords>();
-            winKwMapKernel[TraceSessionManager.KernelKeyword.Process] = KernelTraceEventParser.Keywords.Process;
-            winKwMapKernel[TraceSessionManager.KernelKeyword.Thread] = KernelTraceEventParser.Keywords.Thread;
-            winKwMapKernel[TraceSessionManager.KernelKeyword.ContextSwitch] = KernelTraceEventParser.Keywords.ContextSwitch;
+            kernelKeywords = new Dictionary<TraceSessionManager.KernelKeyword, KernelTraceEventParser.Keywords>();
+            kernelKeywords[TraceSessionManager.KernelKeyword.Process] = KernelTraceEventParser.Keywords.Process;
+            kernelKeywords[TraceSessionManager.KernelKeyword.Thread] = KernelTraceEventParser.Keywords.Thread;
+            kernelKeywords[TraceSessionManager.KernelKeyword.ContextSwitch] = KernelTraceEventParser.Keywords.ContextSwitch;
 
             // initialize windows clr keyword map
-            winKwMapClr = new Dictionary<TraceSessionManager.ClrKeyword, ClrPrivateTraceEventParser.Keywords>();
-            winKwMapClr[TraceSessionManager.ClrKeyword.Startup] = ClrPrivateTraceEventParser.Keywords.Startup;
+            clrKeywords = new Dictionary<TraceSessionManager.ClrKeyword, ClrPrivateTraceEventParser.Keywords>();
+            clrKeywords[TraceSessionManager.ClrKeyword.Startup] = ClrPrivateTraceEventParser.Keywords.Startup;
         }
 
         public void EnableUserProvider(string provider)
         {
             UserSession.EnableProvider(provider);
+        }
+
+        public string GetTraceFilePath()
+        {
+            return traceFilePath;
         }
     }
 }

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Startup": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}
