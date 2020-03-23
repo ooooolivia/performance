@@ -17,7 +17,20 @@ namespace Startup.Tests
         {
             string sessionName = "test-windows-session";
             string traceName = "test-windows-trace";
-            using(var session = TraceSessionManager.CreateSession(sessionName, traceName, traceDirectory, logger))
+            using(var session = new WindowsTraceSession(sessionName, traceName, traceDirectory, logger))
+            {
+                var parser = new ProcessTimeParser();
+                session.EnableProviders(parser);
+                RunTestIteration();
+            }
+        }
+
+        [Fact]
+        public void TestLinuxTraceSession()
+        {
+            string sessionName = "test-linux-session";
+            string traceName = "test-linux-trace";
+            using(var session = new LinuxTraceSession(sessionName, traceName, traceDirectory, logger))
             {
                 var parser = new ProcessTimeParser();
                 session.EnableProviders(parser);

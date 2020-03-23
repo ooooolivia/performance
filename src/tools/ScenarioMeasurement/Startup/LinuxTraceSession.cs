@@ -31,24 +31,18 @@ namespace ScenarioMeasurement
 
         public void EnableKernelProvider(params TraceSessionManager.KernelKeyword[] keywords)
         {
-            // Create keyword list for linux events
-            var pcKernelKeywords = new List<PerfCollect.KernelKeyword>();
             foreach (var keyword in keywords)
             {
-                pcKernelKeywords.Add(linKwMapKernel[keyword]);
+                perfcollect.AddKernelKeyword(linKwMapKernel[keyword]);
             }
-            perfcollect.KernelEvents = pcKernelKeywords;
         }
 
         public void EnableUserProvider(params TraceSessionManager.ClrKeyword[] keywords)
         {
-            // Create keyword list for linux events
-            var pcClrKeywords = new List<PerfCollect.ClrKeyword>();
             foreach (var keyword in keywords)
             {
-                pcClrKeywords.Add(linKwMapClr[keyword]);
+                perfcollect.AddClrKeyword(linKwMapClr[keyword]);
             }
-            perfcollect.ClrEvents = pcClrKeywords;
         }
 
         private void InitLinuxKeywordMaps()
