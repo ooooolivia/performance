@@ -155,6 +155,7 @@ namespace ScenarioMeasurement
 
             var pids = new List<int>();
             bool failed = false;
+            string traceFilePath = "";
 
             // Run trace session
             using (var traceSession = TraceSessionManager.CreateSession("StartupSession", traceFileName, traceDirectory, logger))
@@ -171,12 +172,13 @@ namespace ScenarioMeasurement
                     }
                     pids.Add(iterationResult.Pid);
                 }
+                traceFilePath = traceSession.GetTraceFilePath();
             }
 
             // Parse trace files
             if (!failed)
             {
-                logger.Log("Parsing..");
+                logger.Log($"Parsing {traceFilePath}");
 
                 if (guiApp)
                 {
@@ -188,7 +190,7 @@ namespace ScenarioMeasurement
                     commandLine = commandLine + " " + appArgs;
                 }
 
-                var counters = parser.Parse(traceFileName, Path.GetFileNameWithoutExtension(appExe), pids, commandLine);
+                var counters = parser.Parse(traceFilePath, Path.GetFileNameWithoutExtension(appExe), pids, commandLine);
 
                 WriteResultTable(counters, logger);
 

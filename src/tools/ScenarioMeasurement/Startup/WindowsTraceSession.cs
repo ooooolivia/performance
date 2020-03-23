@@ -2,7 +2,6 @@
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Microsoft.Diagnostics.Tracing.Session;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 
@@ -11,8 +10,6 @@ namespace ScenarioMeasurement
     class WindowsTraceSession : ITraceSession
     {
         private Logger logger;
-        private string traceName;
-        private string traceDirectory;
         private string traceFilePath;
         public TraceEventSession KernelSession { get; set; }
         public TraceEventSession UserSession { get; set; }
@@ -21,14 +18,12 @@ namespace ScenarioMeasurement
 
         public WindowsTraceSession(string sessionName, string traceName, string traceDirectory, Logger logger)
         {
-            this.traceName = traceName;
-            this.traceDirectory = traceDirectory;
             this.logger = logger;
 
             string kernelFileName = Path.ChangeExtension(traceName, "perflabkernel.etl");
             string userFileName = Path.ChangeExtension(traceName, "perflabuser.etl");
+            traceFilePath = Path.Combine(traceDirectory, Path.ChangeExtension(traceName, ".etl"));
 
-            // Currently kernel and user share the same session
             KernelSession = new TraceEventSession(sessionName + "_kernel", Path.Combine(traceDirectory, kernelFileName));
             UserSession = new TraceEventSession(sessionName + "_user", Path.Combine(traceDirectory, userFileName));
             InitWindowsKeywordMaps();
@@ -46,7 +41,6 @@ namespace ScenarioMeasurement
             KernelSession.Dispose();
             UserSession.Dispose();
 
-            string traceFilePath = Path.Combine(traceDirectory, Path.ChangeExtension(traceName, ".etl"));
             MergeFiles(KernelSession.FileName, UserSession.FileName, traceFilePath);
             logger.Log($"Trace Saved to {traceFilePath}");
         }
@@ -68,7 +62,6 @@ namespace ScenarioMeasurement
                 TraceEventSession.Merge(files.ToArray(), traceFile);
                 if (File.Exists(traceFile))
                 {
-                    traceFilePath = traceFile;
                     File.Delete(userTraceFile);
                     File.Delete(kernelTraceFile);
                 }
