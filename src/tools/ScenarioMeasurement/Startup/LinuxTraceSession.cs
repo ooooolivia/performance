@@ -6,13 +6,13 @@ namespace ScenarioMeasurement
 {
     class LinuxTraceSession : ITraceSession
     {
-        private PerfCollect perfcollect;
+        private PerfCollect perfCollect;
         private Dictionary<TraceSessionManager.KernelKeyword, PerfCollect.KernelKeyword> linKwMapKernel;
         private Dictionary<TraceSessionManager.ClrKeyword, PerfCollect.ClrKeyword> linKwMapClr;
 
         public LinuxTraceSession(string sessionName, string traceName, string traceDirectory, Logger logger)
         {
-            perfcollect = new PerfCollect(traceName, traceDirectory, logger);
+            perfCollect = new PerfCollect(traceName, traceDirectory, logger);
             InitLinuxKeywordMaps();
         }
 
@@ -21,19 +21,19 @@ namespace ScenarioMeasurement
             // Enable both providers and start the session
             parser.EnableKernelProvider(this);
             parser.EnableUserProviders(this);
-            perfcollect.Start();
+            perfCollect.Start();
         }
 
         public void Dispose()
         {
-            perfcollect.Stop();
+            perfCollect.Stop();
         }
 
         public void EnableKernelProvider(params TraceSessionManager.KernelKeyword[] keywords)
         {
             foreach (var keyword in keywords)
             {
-                perfcollect.AddKernelKeyword(linKwMapKernel[keyword]);
+                perfCollect.AddKernelKeyword(linKwMapKernel[keyword]);
             }
         }
 
@@ -41,7 +41,7 @@ namespace ScenarioMeasurement
         {
             foreach (var keyword in keywords)
             {
-                perfcollect.AddClrKeyword(linKwMapClr[keyword]);
+                perfCollect.AddClrKeyword(linKwMapClr[keyword]);
             }
         }
 
