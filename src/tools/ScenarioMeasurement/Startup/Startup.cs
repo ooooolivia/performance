@@ -197,12 +197,14 @@ namespace ScenarioMeasurement
                 CreateTestReport(scenarioName, counters, reportJsonPath);
             }
 
+            // Skip unimplemented Linux profiling
+            skipProfileIteration = skipProfileIteration || !TraceSessionManager.IsWindows;
             // Run profile session
             if (!failed && !skipProfileIteration)
             {
                 logger.LogIterationHeader("Profile Iteration");
                 ProfileParser profiler = new ProfileParser(parser);
-                using (var profileSession = TraceSessionManager.CreateProfileSession("ProfileSession", "profile_"+traceFileName, traceDirectory, logger))
+                using (var profileSession = TraceSessionManager.CreateSession("ProfileSession", "profile_"+traceFileName, traceDirectory, logger))
                 {
                     profileSession.EnableProviders(profiler);
                     if (!RunIteration(setupProcHelper, procHelper, cleanupProcHelper, logger).Success)

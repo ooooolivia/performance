@@ -7,7 +7,7 @@ using System.IO;
 
 namespace ScenarioMeasurement
 {
-    class WindowsTraceSession : ITraceSession
+    public class WindowsTraceSession : ITraceSession
     {
         private Logger logger;
         private string traceFilePath;

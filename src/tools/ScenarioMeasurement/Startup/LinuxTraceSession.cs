@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ScenarioMeasurement
 {
-    class LinuxTraceSession : ITraceSession
+    public class LinuxTraceSession : ITraceSession
     {
         private PerfCollect perfCollect;
         private Dictionary<TraceSessionManager.KernelKeyword, PerfCollect.KernelKeyword> kernelKeywords;

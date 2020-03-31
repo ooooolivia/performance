@@ -15,6 +15,15 @@ namespace Startup.Tests
         Logger logger = new Logger("test-startup.log");
         string traceDirectory = Environment.CurrentDirectory;
 
+        [Fact]
+        public void TestPerfCollet()
+        {
+            var perfCollect = new PerfCollect("test-perfcollect", logger);
+            perfCollect.AddKernelKeyword(PerfCollect.KernelKeyword.ContextSwitch);
+            perfCollect.AddClrKeyword(PerfCollect.ClrKeyword.DotNETRuntimePrivate_StartupKeyword);
+            perfCollect.Start();
+        }
+
         [WindowsOnly]
         public void TestWindowsTraceSession()
         {
