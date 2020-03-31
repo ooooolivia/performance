@@ -1,11 +1,8 @@
-﻿using Microsoft.Diagnostics.Tracing.Parsers;
-using Reporting;
+﻿using Reporting;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace ScenarioMeasurement
 {
@@ -172,7 +169,7 @@ namespace ScenarioMeasurement
                     }
                     pids.Add(iterationResult.Pid);
                 }
-                traceFilePath = traceSession.GetTraceFilePath();
+                traceFilePath = traceSession.TraceFilePath;
             }
 
             // Parse trace files

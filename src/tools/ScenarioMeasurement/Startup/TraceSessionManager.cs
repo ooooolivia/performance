@@ -5,11 +5,11 @@ namespace ScenarioMeasurement
 
     public interface ITraceSession : IDisposable
     {
+        string TraceFilePath { get; }
         void EnableProviders(IParser parser);
         void EnableKernelProvider(params TraceSessionManager.KernelKeyword[] keywords);
         void EnableUserProvider(params TraceSessionManager.ClrKeyword[] keywords);
         void EnableUserProvider(string provider);
-        string GetTraceFilePath();
     }
 
     public static class TraceSessionManager
