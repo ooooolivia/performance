@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Startup": {
+      "commandName": "Project",
+      "commandLineArgs": "--scenario-name Test-SDK-ProcessTime --app-exe dotnet --app-args \"build\" --iterations 3 --gui-app false --warmup true --skip-profile-iteration true --process-will-exit true --metric-type ProcessTime --trace-file-name sdk-process-time.etl --working-dir \"C:\\Users\\bache\\repos\\performance-sdk\\src\\scenarios\\emptyconsoletemplate\\app\" --trace-directory traces"
+    }
+  }
+}

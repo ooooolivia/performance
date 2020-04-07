@@ -1,5 +1,7 @@
+using Reporting;
 using ScenarioMeasurement;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Xunit;
@@ -42,6 +44,41 @@ namespace Startup.Tests
             var profileSession = TraceSessionManager.CreateSession(sessionName, traceName, traceDirectory, logger);
             TestSession(profileSession, profileParser);
         }
+
+        [Fact]
+        public void TestProcessTimeParserLinux()
+        {
+            string testDirectory = "inputs";
+            string ctfFile = Path.Combine(testDirectory, "kernel-clr.trace.zip");
+            var parser = new ProcessTimeParser();
+            var pids = new List<int>() { 6105, 6125 };
+            IEnumerable<Counter> counters = parser.Parse(ctfFile, "dotnet", pids, "");
+            int count = 0;
+            foreach (var counter in counters)
+            {
+                Assert.True(counter.Results.Count == pids.Count, $"Counter {counter.Name} is expected to have {pids.Count} results.");
+                count++;
+            }
+            Assert.True(count == 1, "Only Process Time counter should be present.");
+        }
+
+        [Fact]
+        public void TestProcessTimeParserWindows()
+        {
+            string testDirectory = "inputs";
+            string etlFile = Path.Combine(testDirectory, "sample-trace.etl");
+            var parser = new ProcessTimeParser();
+            var pids = new List<int>() { 32752, 6352, 16876, 10500, 17784 };
+            IEnumerable<Counter> counters = parser.Parse(etlFile, "dotnet", pids, "\"dotnet\" build");
+            int count = 0;
+            foreach (var counter in counters)
+            {
+                Assert.True(counter.Results.Count == pids.Count, $"Counter {counter.Name} is expected to have {pids.Count} results.");
+                count++;
+            }
+            Assert.True(count==2, "Both Process Time and Time To Main counter should be present.");
+        }
+
 
         private void TestSession(ITraceSession session, IParser parser)
         {
