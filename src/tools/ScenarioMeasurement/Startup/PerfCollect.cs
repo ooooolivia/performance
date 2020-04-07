@@ -120,9 +120,9 @@ namespace ScenarioMeasurement
         public enum KernelKeyword
         {
             Empty,
-            ProcessLifetime,
-            Thread,
-            ContextSwitch
+            LTTng_Kernel_ProcessLifetimeKeyword,
+            LTTng_Kernel_ThreadKeyword,
+            LTTng_Kernel_ContextSwitchKeyword
         }
 
         public enum ClrKeyword

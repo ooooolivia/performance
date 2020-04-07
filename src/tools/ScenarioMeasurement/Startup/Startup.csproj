@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <Target Name="DownloadPerfCollect" BeforeTargets="CoreCompile" Condition=" '$(OS)' != 'Windows_NT' ">
-    <!-- <PropertyGroup>
+    <PropertyGroup>
       <PerfcollectUrl>https://aka.ms/perfcollect</PerfcollectUrl>
     </PropertyGroup>
     <DownloadFile SourceUrl="$(PerfcollectUrl)" 
@@ -27,7 +27,7 @@
                   Retries="3"
                   SkipUnchangedFiles="true">
       <Output TaskParameter="DownloadedFile" ItemName="Content"/>
-    </DownloadFile> -->
+    </DownloadFile>
     <Copy SourceFiles="perfcollect" DestinationFolder="$(PublishDir)" />
     <Copy SourceFiles="perfcollect" DestinationFolder="$(OutDir)" />
   </Target>

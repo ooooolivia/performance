@@ -56,9 +56,9 @@ namespace ScenarioMeasurement
         {
             // initialize linux kernel keyword map
             kernelKeywords = new Dictionary<TraceSessionManager.KernelKeyword, PerfCollect.KernelKeyword>();
-            kernelKeywords[TraceSessionManager.KernelKeyword.Process] = PerfCollect.KernelKeyword.ProcessLifetime;
-            kernelKeywords[TraceSessionManager.KernelKeyword.Thread] = PerfCollect.KernelKeyword.Thread;
-            kernelKeywords[TraceSessionManager.KernelKeyword.ContextSwitch] = PerfCollect.KernelKeyword.ContextSwitch;
+            kernelKeywords[TraceSessionManager.KernelKeyword.Process] = PerfCollect.KernelKeyword.LTTng_Kernel_ProcessLifetimeKeyword;
+            kernelKeywords[TraceSessionManager.KernelKeyword.Thread] = PerfCollect.KernelKeyword.LTTng_Kernel_ThreadKeyword;
+            kernelKeywords[TraceSessionManager.KernelKeyword.ContextSwitch] = PerfCollect.KernelKeyword.LTTng_Kernel_ContextSwitchKeyword;
 
             // initialize linux clr keyword map
             clrKeywords = new Dictionary<TraceSessionManager.ClrKeyword, PerfCollect.ClrKeyword>();
