@@ -49,9 +49,9 @@ namespace Startup.Tests
         public void TestProcessTimeParserLinux()
         {
             string testDirectory = "inputs";
-            string ctfFile = Path.Combine(testDirectory, "kernel-clr.trace.zip");
+            string ctfFile = Path.Combine(testDirectory, "test-linux-collect-1.trace.zip");
             var parser = new ProcessTimeParser();
-            var pids = new List<int>() { 6105, 6125 };
+            var pids = new List<int>() { 18627, 18674, 18721, 18768, 18813 };
             IEnumerable<Counter> counters = parser.Parse(ctfFile, "dotnet", pids, "");
             int count = 0;
             foreach (var counter in counters)

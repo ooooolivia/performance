@@ -25,6 +25,7 @@ namespace ScenarioMeasurement
             var ins = new Dictionary<int, double>();
             double start = -1;
             int? pid = null;
+
             using (var source = new TraceSourceManager(mergeTraceFile))
             {
                 source.Kernel.ProcessStart += evt =>
@@ -75,17 +76,21 @@ namespace ScenarioMeasurement
 
                 source.Kernel.ProcessStop += evt =>
                 {
-                    // is it possible that neither pid and evt.ProcessID has value?
                     if (pid.HasValue && pid == evt.ProcessID)
                     {
+                        // For Linux both pid and tid should match
+                        if (!source.IsWindows && source.Kernel.GetPayloadThreadID(evt) != pid)
+                        {
+                            return;
+                        }
                         results.Add(evt.TimeStampRelativeMSec - start);
                         pid = null;
+                        start = 0;
                         if (source.IsWindows)
                         {
                             threadTimes.Add(threadTime);
                             threadTime = 0;
                         }
-                        start = 0;
                     }
                 };
 

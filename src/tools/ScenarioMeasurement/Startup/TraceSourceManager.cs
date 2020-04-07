@@ -54,6 +54,7 @@ namespace ScenarioMeasurement
         public event Action<TraceEvent> ProcessStop;
         public event Action<TraceEvent> ContextSwitch;
         public string GetEventCommandLine(TraceEvent evt);
+        public int GetPayloadThreadID(TraceEvent evt);
     }
 
         public sealed class LinuxKernelParser : IKernelParser
@@ -68,7 +69,13 @@ namespace ScenarioMeasurement
 
         public string GetEventCommandLine(TraceEvent evt)
         {
+            Console.WriteLine("Not applicable to Linux Kernel event payload.");
             return "";
+        }
+
+        public int GetPayloadThreadID(TraceEvent evt)
+        {
+            return ((ProcessStopTraceData)evt).PayloadThreadID;
         }
     }
 
@@ -87,6 +94,12 @@ namespace ScenarioMeasurement
         public string GetEventCommandLine(TraceEvent evt)
         {
             return ((ProcessTraceData)evt).CommandLine;
+        }
+
+        public int GetPayloadThreadID(TraceEvent evt)
+        {
+            Console.WriteLine("Not applicable to ETW Kernel event payload.");
+            return 0;
         }
     }
 
