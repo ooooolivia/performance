@@ -83,14 +83,14 @@ namespace ScenarioMeasurement
             {
                 throw new FileNotFoundException("Trace file not found.");
             }
-            string destinationFile = Path.Combine(TraceDirectory, traceFile);
-            if (File.Exists(destinationFile))
-            {
-                File.Delete(destinationFile);
-            }
+            // string destinationFile = Path.Combine(TraceDirectory, traceFile);
+            // if (File.Exists(destinationFile))
+            // {
+            //     File.Delete(destinationFile);
+            // }
             TraceFilePath = Path.Combine(TraceDirectory, traceFile);
-            File.Move(traceFile, TraceFilePath);
-
+            //File.Move(traceFile, TraceFilePath);
+            Console.WriteLine($"PerfCollect TraceFilePath: {TraceFilePath}");
             //TODO: move logs to appropriate location
             return result;
         }
