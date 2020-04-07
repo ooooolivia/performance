@@ -5,9 +5,13 @@ namespace ScenarioMeasurement
 {
     public class LinuxTraceSession : ITraceSession
     {
-        public string TraceFilePath { get { 
-            Console.WriteLine($"LinuxTraceSession TraceFilePath {perfCollect.TraceFilePath}");
-            return perfCollect.TraceFilePath; 
+        private string _tracefilepath;
+        public string TraceFilePath { 
+            get { 
+                if (String.IsNullOrEmpty(_tracefilepath)){
+                    _tracefilepath = perfCollect.TraceFilePath;
+                }
+                return _tracefilepath;
             } }
         private PerfCollect perfCollect;
         private Dictionary<TraceSessionManager.KernelKeyword, PerfCollect.KernelKeyword> kernelKeywords;
