@@ -5,7 +5,6 @@ namespace ScenarioMeasurement
 {
     public class LinuxTraceSession : ITraceSession
     {
-        private string _tracefilepath;
         public string TraceFilePath { 
             get { 
                 // if (String.IsNullOrEmpty(_tracefilepath)){
