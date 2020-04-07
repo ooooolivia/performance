@@ -8,10 +8,11 @@ namespace ScenarioMeasurement
         private string _tracefilepath;
         public string TraceFilePath { 
             get { 
-                if (String.IsNullOrEmpty(_tracefilepath)){
-                    _tracefilepath = perfCollect.TraceFilePath;
-                }
-                return _tracefilepath;
+                // if (String.IsNullOrEmpty(_tracefilepath)){
+                //     _tracefilepath = perfCollect.TraceFilePath;
+                // }
+                // return _tracefilepath;
+                return perfCollect.TraceFilePath;
             } }
         private PerfCollect perfCollect;
         private Dictionary<TraceSessionManager.KernelKeyword, PerfCollect.KernelKeyword> kernelKeywords;
