@@ -12,6 +12,7 @@ namespace Startup.Tests
     {
         Logger logger = new Logger("test-startup.log");
         string traceDirectory = Environment.CurrentDirectory;
+        string testAssetDirectory = "inputs";
 
 
         [WindowsOnly]
@@ -48,8 +49,7 @@ namespace Startup.Tests
         [Fact]
         public void TestProcessTimeParserLinux()
         {
-            string testDirectory = "inputs";
-            string ctfFile = Path.Combine(testDirectory, "test-linux-collect-1.trace.zip");
+            string ctfFile = Path.Combine(testAssetDirectory, "test-linux-collect-1.trace.zip");
             var parser = new ProcessTimeParser();
             var pids = new List<int>() { 18627, 18674, 18721, 18768, 18813 };
             IEnumerable<Counter> counters = parser.Parse(ctfFile, "dotnet", pids, "");
@@ -65,8 +65,7 @@ namespace Startup.Tests
         [Fact]
         public void TestProcessTimeParserWindows()
         {
-            string testDirectory = "inputs";
-            string etlFile = Path.Combine(testDirectory, "sample-trace.etl");
+            string etlFile = Path.Combine(testAssetDirectory, "sample-trace.etl");
             var parser = new ProcessTimeParser();
             var pids = new List<int>() { 32752, 6352, 16876, 10500, 17784 };
             IEnumerable<Counter> counters = parser.Parse(etlFile, "dotnet", pids, "\"dotnet\" build");
@@ -77,6 +76,28 @@ namespace Startup.Tests
                 count++;
             }
             Assert.True(count==2, "Both Process Time and Time To Main counter should be present.");
+        }
+
+        [Fact]
+        public void TestTimeToMainParserLinux()
+        {
+        }
+
+
+        [Fact]
+        public void TestTimeToMainParserWindows()
+        {
+            string etlFile = Path.Combine(testAssetDirectory, "test-time-to-main_startup.etl");
+            var parser = new TimeToMainParser();
+            var pids = new List<int>() { 17036, 21640, 12912, 19764, 11624 };
+            IEnumerable<Counter> counters = parser.Parse(etlFile, "emptycsconsoletemplate", pids, "\"pub\\emptycsconsoletemplate.exe\"");
+            int count = 0;
+            foreach (var counter in counters)
+            {
+                Assert.True(counter.Results.Count == pids.Count, $"Counter {counter.Name} is expected to have {pids.Count} results.");
+                count++;
+            }
+            Assert.True(count == 2, "Both Process Time and Time To Main counter should be present.");
         }
 
 

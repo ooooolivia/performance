@@ -28,6 +28,7 @@
                   SkipUnchangedFiles="true">
       <Output TaskParameter="DownloadedFile" ItemName="Content"/>
     </DownloadFile>
+    <Exec Command="chmod +x perfcollect"/>
     <Copy SourceFiles="perfcollect" DestinationFolder="$(PublishDir)" />
     <Copy SourceFiles="perfcollect" DestinationFolder="$(OutDir)" />
   </Target>
