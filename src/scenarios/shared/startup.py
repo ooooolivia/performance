@@ -63,7 +63,7 @@ class StartupWrapper(object):
             self.startuppath,
             '--app-exe', apptorun,
             '--metric-type', kwargs['startupmetric'], 
-            '--trace-file-name', '%s_startup.etl' % (kwargs['scenarioname'] or '%s_%s' % (kwargs['exename'],kwargs['scenariotypename'])),
+            '--trace-name', '%s_startup' % (kwargs['scenarioname'] or '%s_%s' % (kwargs['exename'],kwargs['scenariotypename'])),
             '--process-will-exit', (kwargs['processwillexit'] or 'true'),
             '--iterations', '%s' % (kwargs['iterations'] or defaultiterations),
             '--timeout', '%s' % (kwargs['timeout'] or '50'),

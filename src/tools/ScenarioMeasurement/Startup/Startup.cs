@@ -44,7 +44,7 @@ namespace ScenarioMeasurement
         static int Main(string appExe,
                         MetricType metricType,
                         string scenarioName,
-                        string traceFileName,
+                        string traceName,
                         bool processWillExit = false,
                         int iterations = 5,
                         string iterationSetup = "",
@@ -71,7 +71,7 @@ namespace ScenarioMeasurement
                     throw new ArgumentException(name);
             };
             checkArg(appExe, nameof(appExe));
-            checkArg(traceFileName, nameof(traceFileName));
+            checkArg(traceName, nameof(traceName));
 
             if (String.IsNullOrEmpty(traceDirectory))
             {
@@ -155,7 +155,7 @@ namespace ScenarioMeasurement
             string traceFilePath = "";
 
             // Run trace session
-            using (var traceSession = TraceSessionManager.CreateSession("StartupSession", traceFileName, traceDirectory, logger))
+            using (var traceSession = TraceSessionManager.CreateSession("StartupSession", traceName, traceDirectory, logger))
             {
                 traceSession.EnableProviders(parser);
                 for (int i = 0; i < iterations; i++)
@@ -201,7 +201,7 @@ namespace ScenarioMeasurement
             {
                 logger.LogIterationHeader("Profile Iteration");
                 ProfileParser profiler = new ProfileParser(parser);
-                using (var profileSession = TraceSessionManager.CreateSession("ProfileSession", "profile_"+traceFileName, traceDirectory, logger))
+                using (var profileSession = TraceSessionManager.CreateSession("ProfileSession", "profile_"+traceName, traceDirectory, logger))
                 {
                     profileSession.EnableProviders(profiler);
                     if (!RunIteration(setupProcHelper, procHelper, cleanupProcHelper, logger).Success)
