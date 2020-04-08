@@ -86,12 +86,15 @@ namespace ScenarioMeasurement
                 throw new FileNotFoundException($"Trace file not found at {Path.GetFullPath(TraceFileName)}.");
             }
             // Don't move file if destination directory is current directory
-            if (Path.GetDirectoryName(TraceFilePath) != Environment.CurrentDirectory){
+            Console.WriteLine($"full path: {Path.GetFullPath(Path.GetDirectoryName(TraceFilePath))}");
+            Console.WriteLine($"current directory: {Environment.CurrentDirectory}");
+            if (Path.GetFullPath(Path.GetDirectoryName(TraceFilePath)) != Environment.CurrentDirectory){
                 // Overwrite file at destination directory
                 if(File.Exists(TraceFilePath)){
                     Console.WriteLine($"Deleting existing file at {TraceFilePath}...");
                     File.Delete(TraceFilePath);
                 }
+                Console.WriteLine($"moving file from {Path.GetFullPath(TraceFileName)} to {TraceFilePath}");
                 File.Move(TraceFileName, TraceFilePath);
             }
             //TODO: move logs to appropriate location
