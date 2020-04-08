@@ -76,11 +76,11 @@ namespace ScenarioMeasurement
 
         public ProcessHelper.Result Stop()
         {
+            Console.WriteLine($"full path: {Path.GetFullPath(Path.GetDirectoryName(TraceFilePath))}");
+            Console.WriteLine($"current directory: {Environment.CurrentDirectory}");
             string arguments = $"stop {TraceName} ";
             perfCollectProcess.Arguments = arguments;
             var result = perfCollectProcess.Run().Result;
-            Console.WriteLine($"full path: {Path.GetFullPath(Path.GetDirectoryName(TraceFilePath))}");
-            Console.WriteLine($"current directory: {Environment.CurrentDirectory}");
             // By default perfcollect saves traces in the current directory
             if (!File.Exists(TraceFileName))
             {
