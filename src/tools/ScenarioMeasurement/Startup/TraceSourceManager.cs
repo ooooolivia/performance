@@ -66,17 +66,6 @@ namespace ScenarioMeasurement
         public LinuxKernelParser(CtfTraceEventSource source) {
             parser = new LinuxKernelEventParser(source);
         }
-
-        public string GetEventCommandLine(TraceEvent evt)
-        {
-            Console.WriteLine("Not applicable to Linux Kernel event payload.");
-            return "";
-        }
-
-        public int GetPayloadThreadID(TraceEvent evt)
-        {
-            return (int)evt.PayloadByName("PayloadThreadID");
-        }
     }
 
     public sealed class WindowsKernelParser : IKernelParser
@@ -89,17 +78,6 @@ namespace ScenarioMeasurement
         public WindowsKernelParser(ETWTraceEventSource source)
         {
             parser = new KernelTraceEventParser(source);
-        }
-
-        public string GetEventCommandLine(TraceEvent evt)
-        {
-            return (string)evt.PayloadByName("CommandLine");
-        }
-
-        public int GetPayloadThreadID(TraceEvent evt)
-        {
-            Console.WriteLine("Not applicable to ETW Kernel event payload.");
-            return 0;
         }
     }
 
