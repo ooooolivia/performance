@@ -13,13 +13,13 @@ from shared.util import publishedexe, extension
 from shared import const
 from performance.logger import setup_loggers
 
-
+# Scenario-independent traits that can be set in test.py, 
+# but can also be overriden in scenario-specific case
 reqfields = ('exename',
             )
 optfields = ('guiapp',
              'startupmetric',
              'appargs',
-             'environmentvariables',
              'iterations',
              'timeout',
              'warmup',
