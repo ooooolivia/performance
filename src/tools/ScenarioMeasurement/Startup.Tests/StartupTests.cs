@@ -49,7 +49,7 @@ namespace Startup.Tests
         [Fact]
         public void TestProcessTimeParserLinux()
         {
-            string ctfFile = Path.Combine(testAssetDirectory, "test-linux-collect-1.trace.zip");
+            string ctfFile = Path.Combine(testAssetDirectory, "test-process-time_startup.trace.zip");
             var parser = new ProcessTimeParser();
             var pids = new List<int>() { 18627, 18674, 18721, 18768, 18813 };
             IEnumerable<Counter> counters = parser.Parse(ctfFile, "dotnet", pids, "\"dotnet\" build");
@@ -65,7 +65,7 @@ namespace Startup.Tests
         [Fact]
         public void TestProcessTimeParserWindows()
         {
-            string etlFile = Path.Combine(testAssetDirectory, "sample-trace.etl");
+            string etlFile = Path.Combine(testAssetDirectory, "test-process-time_startup.etl");
             var parser = new ProcessTimeParser();
             var pids = new List<int>() { 32752, 6352, 16876, 10500, 17784 };
             IEnumerable<Counter> counters = parser.Parse(etlFile, "dotnet", pids, "\"dotnet\" build");
