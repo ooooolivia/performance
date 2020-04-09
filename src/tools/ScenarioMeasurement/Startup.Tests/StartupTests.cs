@@ -52,7 +52,7 @@ namespace Startup.Tests
             string ctfFile = Path.Combine(testAssetDirectory, "test-linux-collect-1.trace.zip");
             var parser = new ProcessTimeParser();
             var pids = new List<int>() { 18627, 18674, 18721, 18768, 18813 };
-            IEnumerable<Counter> counters = parser.Parse(ctfFile, "dotnet", pids, "");
+            IEnumerable<Counter> counters = parser.Parse(ctfFile, "dotnet", pids, "\"dotnet\" build");
             int count = 0;
             foreach (var counter in counters)
             {
@@ -81,6 +81,17 @@ namespace Startup.Tests
         [Fact]
         public void TestTimeToMainParserLinux()
         {
+            string ctfFile = Path.Combine(testAssetDirectory, "test-time-to-main_startup.trace.zip");
+            var parser = new TimeToMainParser();
+            var pids = new List<int>() { 24352, 24362, 24371, 24380, 24389 };
+            IEnumerable<Counter> counters = parser.Parse(ctfFile, "emptycsconsoletemplate", pids, "\"pub\\emptycsconsoletemplate.exe\"");
+            int count = 0;
+            foreach (var counter in counters)
+            {
+                Assert.True(counter.Results.Count == pids.Count, $"Counter {counter.Name} is expected to have {pids.Count} results.");
+                count++;
+            }
+            Assert.True(count == 2, "Only Time To Main counter should be present.");
         }
 
 
@@ -97,7 +108,7 @@ namespace Startup.Tests
                 Assert.True(counter.Results.Count == pids.Count, $"Counter {counter.Name} is expected to have {pids.Count} results.");
                 count++;
             }
-            Assert.True(count == 2, "Both Process Time and Time To Main counter should be present.");
+            Assert.True(count == 2, "Both Time To Main and Time To Thread counter should be present.");
         }
 
 

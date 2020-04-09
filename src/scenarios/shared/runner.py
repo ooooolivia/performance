@@ -108,7 +108,8 @@ class Runner:
                              scenariotypename=const.SCENARIO_NAMES[const.STARTUP],
                              apptorun=publishedexe(self.traits.exename))
         elif self.testtype == const.SDK:
-            envlistbuild = 'DOTNET_MULTILEVEL_LOOKUP=0'
+            envlist = 'COMPlus_EnableEventLog=1' if sys.platform != 'win32' else ''
+            envlistbuild = ';'.join(['DOTNET_MULTILEVEL_LOOKUP=0', envlist])
             envlistcleanbuild= ';'.join(['MSBUILDDISABLENODEREUSE=1', envlistbuild])
             # clean build
             if self.sdktype == const.CLEAN_BUILD:

@@ -75,7 +75,7 @@ namespace ScenarioMeasurement
 
         public int GetPayloadThreadID(TraceEvent evt)
         {
-            return ((ProcessStopTraceData)evt).PayloadThreadID;
+            return (int)evt.PayloadByName("PayloadThreadID");
         }
     }
 
@@ -93,7 +93,7 @@ namespace ScenarioMeasurement
 
         public string GetEventCommandLine(TraceEvent evt)
         {
-            return ((ProcessTraceData)evt).CommandLine;
+            return (string)evt.PayloadByName("CommandLine");
         }
 
         public int GetPayloadThreadID(TraceEvent evt)

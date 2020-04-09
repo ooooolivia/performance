@@ -1,9 +1,7 @@
 ﻿using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Reporting;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace ScenarioMeasurement
 {
@@ -32,19 +30,8 @@ namespace ScenarioMeasurement
 
                 source.Kernel.ProcessStart += evt =>
                 {
-                    if (processName.Equals(evt.ProcessName, StringComparison.OrdinalIgnoreCase) && pids.Contains(evt.ProcessID))
+                    if (!pid.HasValue && ParserUtility.MatchProcess(evt, source, processName, pids, commandLine))
                     {
-                        // Check command line on Windwos only since Linux process trace data doesn't have command line field
-                        // TODO: check the frequency of PID reuse on Linux
-                        if (source.IsWindows && source.Kernel.GetEventCommandLine(evt).Trim() != commandLine)
-                        {
-                            return;
-                        }
-                        if (pid.HasValue)
-                        {
-                            // Processes might be reentrant. For now this traces the first (outermost) process of a given name.
-                            return;
-                        }
                         pid = evt.ProcessID;
                         start = evt.TimeStampRelativeMSec;
                     }
@@ -78,13 +65,8 @@ namespace ScenarioMeasurement
                 ClrPrivateTraceEventParser clrpriv = new ClrPrivateTraceEventParser(source.Source);
                 clrpriv.StartupMainStart += evt =>
                 {
-                    if(pid.HasValue && evt.ProcessID == pid && evt.ProcessName.Equals(processName, StringComparison.OrdinalIgnoreCase))
+                    if(pid.HasValue && ParserUtility.MatchProcessByPid(evt, source, (int)pid, processName, commandLine))
                     {
-                        // For Linux both pid and tid should match
-                        if (!source.IsWindows && source.Kernel.GetPayloadThreadID(evt) != pid)
-                        {
-                            return;
-                        }
                         results.Add(evt.TimeStampRelativeMSec - start);
                         pid = null;
                         start = 0;
