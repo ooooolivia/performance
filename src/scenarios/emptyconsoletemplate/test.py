@@ -7,21 +7,12 @@ SCENARIONAME = 'Empty C# Console Template'
 EXENAME = 'emptycsconsoletemplate'
 
 if __name__ == "__main__":
-<<<<<<< Updated upstream
-    traits = TestTraits(exename=EXENAME, 
-                        #startupmetric='TimeToMain',
-                        startup=True,
-                        sdk=True,
-                        guiapp='false',
-                        )
-=======
-    traits = TestTraits(EXENAME)
-    traits.add_traits(startupmetric='TimeToMain',
+    traits = TestTraits(EXENAME) # required fields which should be initalized with the object
+    traits.add_traits(startupmetric='TimeToMain',  # optional fields defined in test.py have higher priority that traits in runner.py
                       startup=True,
                       sdk=True,
                       guiapp='false',
                       processwillexit='true',
                       iterations='3'
                      )
->>>>>>> Stashed changes
     Runner(traits).run()

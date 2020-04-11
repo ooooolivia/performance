@@ -49,7 +49,7 @@ class TestTraits:
         if not exename:
             raise Exception("exename cannot be empty")
         self.traits['exename'] = exename
-        
+    
     def add_traits(self, **kwargs):
         for key in kwargs:
             # validate the keyword
@@ -58,7 +58,6 @@ class TestTraits:
             # don't override existing values in the dictionary
             if key not in self.traits:
                 self.traits[key] = kwargs[key]
-        print(self.traits)
             
 
 
@@ -123,6 +122,7 @@ class Runner:
         self.parseargs()
         startup = StartupWrapper()
         if self.testtype == const.STARTUP:
+            # add the remaining traits 
             self.traits.add_traits(**dict.fromkeys(optfields))
             startup.runtests(**self.traits.traits,
                              scenarioname=self.scenarioname,
