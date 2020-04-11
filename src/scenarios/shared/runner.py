@@ -38,9 +38,29 @@ testtypes = {const.STARTUP: False,
              const.SDK: False,
              const.CROSSGEN: False}
 
-TestTraits = namedtuple('TestTraits',
-                        reqfields  + tuple(testtypes.keys()) + optfields,
-                        defaults=tuple(testtypes.values()) + (None,) * len(optfields))
+# TestTraits = namedtuple('TestTraits',
+#                         reqfields  + tuple(testtypes.keys()) + optfields,
+#                         #defaults=tuple(testtypes.values()) + (None,) * len(optfields)
+#                         )
+
+class TestTraits:
+    traits = {}
+    def __init__(self, exename:str):
+        if not exename:
+            raise Exception("exename cannot be empty")
+        self.traits['exename'] = exename
+        
+    def add_traits(self, **kwargs):
+        for key in kwargs:
+            # validate the keyword
+            if key not in optfields+reqfields+tuple(testtypes.keys()):
+                raise Exception(f"Keyword {key} not found in required fields")
+            # don't override existing values in the dictionary
+            if key not in self.traits:
+                self.traits[key] = kwargs[key]
+        print(self.traits)
+            
+
 
 class Runner:
     '''
@@ -75,9 +95,9 @@ class Runner:
         self.add_common_arguments(crossgenparser)
         args = parser.parse_args()
 
-        if not getattr(self.traits, args.testtype):
-            getLogger().error("Test type %s is not supported by this scenario", args.testtype)
-            sys.exit(1)
+        # if not getattr(self.traits, args.testtype):
+        #     getLogger().error("Test type %s is not supported by this scenario", args.testtype)
+        #     sys.exit(1)
         self.testtype = args.testtype
 
         if self.testtype == const.SDK:
@@ -95,16 +115,6 @@ class Runner:
         parser.add_argument('--scenario-name',
                             dest='scenarioname')
                     
-    # this function takes both test traits, choose asset-specific traits (defined in test.py) over scenario-specific traits                
-    def _fill_keywords(self, asset_traits: TestTraits, scenario_traits: TestTraits):
-        keywords = {}
-        for trait in asset_traits._fields:
-            if getattr(asset_traits, trait):
-                keywords[trait] = getattr(asset_traits, trait)
-            else:
-                keywords[trait] = getattr(scenario_traits, trait)
-        return keywords
-
         
     def run(self):
         '''
@@ -113,10 +123,12 @@ class Runner:
         self.parseargs()
         startup = StartupWrapper()
         if self.testtype == const.STARTUP:
-            startup.runtests(**self.traits._asdict(),
+            self.traits.add_traits(**dict.fromkeys(optfields))
+            startup.runtests(**self.traits.traits,
                              scenarioname=self.scenarioname,
                              scenariotypename=const.SCENARIO_NAMES[const.STARTUP],
-                             apptorun=publishedexe(self.traits.exename))
+                             apptorun=publishedexe(self.traits.traits['exename']),
+                             environmentvariables='COMPlus_EnableEventLog=1' if sys.platform != 'win32' else '')
         elif self.testtype == const.SDK:
             envlistbuild = 'DOTNET_MULTILEVEL_LOOKUP=0'
             envlistcleanbuild= ';'.join(['MSBUILDDISABLENODEREUSE=1', envlistbuild])
