@@ -8,7 +8,7 @@ EXENAME = 'emptycsconsoletemplate'
 
 if __name__ == "__main__":
     traits = TestTraits(exename=EXENAME, 
-                        startupmetric='TimeToMain',
+                        #startupmetric='TimeToMain',
                         startup=True,
                         sdk=True,
                         guiapp='false',

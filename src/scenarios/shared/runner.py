@@ -94,6 +94,16 @@ class Runner:
         "Common arguments to add to subparsers"
         parser.add_argument('--scenario-name',
                             dest='scenarioname')
+                    
+    # this function takes both test traits, choose asset-specific traits (defined in test.py) over scenario-specific traits                
+    def _fill_keywords(self, asset_traits: TestTraits, scenario_traits: TestTraits):
+        keywords = {}
+        for trait in asset_traits._fields:
+            if getattr(asset_traits, trait):
+                keywords[trait] = getattr(asset_traits, trait)
+            else:
+                keywords[trait] = getattr(scenario_traits, trait)
+        return keywords
 
         
     def run(self):
@@ -133,25 +143,26 @@ class Runner:
                              )
             # build(no changes)
             if self.sdktype == const.BUILD_NO_CHANGE:
-                startup.runtests(scenarioname=self.scenarioname,
-                                exename=self.traits.exename,
-                                guiapp=self.traits.guiapp,
-                                startupmetric=const.STARTUP_PROCESSTIME,
-                                appargs='build',
-                                timeout=self.traits.timeout,
-                                warmup='true',
-                                iterations=self.traits.iterations,
-                                scenariotypename='%s_%s' % (const.SCENARIO_NAMES[const.SDK], const.BUILD_NO_CHANGE),
-                                apptorun=const.DOTNET,
-                                iterationsetup=None,
-                                setupargs=None,
-                                iterationcleanup=None,
-                                cleanupargs=None,
-                                workingdir= const.APPDIR if not self.traits.workingdir else os.path.join(const.APPDIR, self.traits.workingdir),
-                                environmentvariables=envlistbuild,
-                                processwillexit=self.traits.processwillexit,
-                                measurementdelay=self.traits.measurementdelay
-                                )
+                # scenario(sdk-no-change) specific traits, but can be overriden by traits defined in test.py
+                scenario_traits = TestTraits(startupmetric=const.STARTUP_PROCESSTIME,
+                                             appargs='build',
+                                             timeout=self.traits.timeout,
+                                             warmup='true',
+                                             iterations=self.traits.iterations,
+                                             iterationsetup=None,
+                                             setupargs=None,
+                                             iterationcleanup=None,
+                                             cleanupargs=None,
+                                             workingdir= const.APPDIR if not self.traits.workingdir else os.path.join(const.APPDIR, self.traits.workingdir),
+                                             )
+                # transform both traits into a dictionary that can be expanded into keyword arguments
+                keywords = self._fill_keywords(self.traits, scenario_traits)
+                # pass in traits and other startup arguments
+                startup.runtests(**keywords,
+                                 scenarioname=self.scenarioname,
+                                 scenariotypename='%s_%s' % (const.SCENARIO_NAMES[const.SDK], const.BUILD_NO_CHANGE),
+                                 apptorun=const.DOTNET,
+                                 environmentvariables=envlistbuild)
             # new console
             if self.sdktype == const.NEW_CONSOLE:
                 startup.runtests(scenarioname=self.scenarioname,
