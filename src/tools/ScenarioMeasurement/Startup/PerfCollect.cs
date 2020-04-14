@@ -48,10 +48,11 @@ namespace ScenarioMeasurement
             {
                 ProcessWillExit = true,
                 Executable = perfCollectScript,
-                Timeout = 300
+                Timeout = 300,
+                RootAccess = true
             };
 
-            if (Environment.GetEnvironmentVariable("PERF_INLAB")=="1" && Install() != ProcessHelper.Result.Success)
+            if (Environment.GetEnvironmentVariable("PERFLAB_INLAB")=="1" && Install() != ProcessHelper.Result.Success)
             {
                 throw new Exception("Lttng installation failed. Please try manual install.");
             }
