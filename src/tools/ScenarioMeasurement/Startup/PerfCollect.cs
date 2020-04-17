@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -23,7 +23,6 @@ namespace ScenarioMeasurement
 
         public PerfCollect(string traceName, string traceDirectory, Logger logger)
         {
-            TraceName = traceName;
             string perfCollectScript = Path.Combine(startupDirectory, "perfcollect");
             if (!File.Exists(perfCollectScript))
             {
@@ -34,6 +33,7 @@ namespace ScenarioMeasurement
             {
                 throw new ArgumentException("Trace file name cannot be empty.");
             }
+            TraceName = traceName.Replace(" ", "_");
 
             if (!Directory.Exists(traceDirectory))
             {
@@ -41,15 +41,21 @@ namespace ScenarioMeasurement
             }
 
             TraceDirectory = traceDirectory;
-            TraceFileName = $"{traceName}.trace.zip";
+            TraceFileName = $"{TraceName}.trace.zip";
             TraceFilePath = Path.Combine(traceDirectory, TraceFileName);
 
             perfCollectProcess = new ProcessHelper(logger)
             {
                 ProcessWillExit = true,
                 Executable = perfCollectScript,
-                Timeout = 300
+                Timeout = 300,
+                RootAccess = true
             };
+
+            if (Environment.GetEnvironmentVariable("PERFLAB_INLAB")=="1" && Install() != ProcessHelper.Result.Success)
+            {
+                throw new Exception("Lttng installation failed. Please try manual install.");
+            }
         }
 
         public ProcessHelper.Result Start()
@@ -99,6 +105,17 @@ namespace ScenarioMeasurement
 
         public ProcessHelper.Result Install()
         {
+            /*Process checkLttngProcess = Process.Start("command", "lttng >/dev/null 2>&1");
+            checkLttngProcess.WaitForExit();        
+            // checkLttngProcess.StartInfo.FileName = "lttng";
+            // checkLttngProcess.StartInfo.Arguments = ">/dev/null 2>&1";
+            //checkLttngProcess.StartInfo.UseShellExecute = true;
+            if (checkLttngProcess.ExitCode != 0)
+            {
+                perfCollectProcess.Arguments = "install -force";
+                return perfCollectProcess.Run().Result;
+            }
+            return ProcessHelper.Result.Success;*/
             perfCollectProcess.Arguments = "install -force";
             return perfCollectProcess.Run().Result;
         }
