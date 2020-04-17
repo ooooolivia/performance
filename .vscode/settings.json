@@ -9,5 +9,6 @@
         "**/obj/": true,
         "**/packages/": true,
         "tools/": true,
-    }
+    },
+    "python.formatting.provider": "autopep8"
 }
