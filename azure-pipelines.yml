@@ -579,3 +579,17 @@ jobs:
       projectFile: sdk_scenarios.proj
       channels:
         - $(channel) # for manual runs we can specify channel variable 
+
+  # Ubuntu 1604 x64 SDK scenario benchmarks
+  - template: /eng/performance/scenarios.yml
+    parameters:
+      osName: ubuntu
+      osVersion: 1604
+      architecture: x64
+      pool: Hosted Ubuntu 1604
+      kind: sdk_scenarios
+      queue: Ubuntu.1604.Amd64.Perf
+      container: ubuntu_x64_build_container
+      projectFile: sdk_scenarios.proj
+      channels:
+        - $(channel)
