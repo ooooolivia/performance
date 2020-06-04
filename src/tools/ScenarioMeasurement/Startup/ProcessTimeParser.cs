@@ -30,6 +30,13 @@ namespace ScenarioMeasurement
             {
                 source.Kernel.ProcessStart += evt =>
                 {
+                    if (pids.Contains(evt.ProcessID))
+                    {
+                        Console.WriteLine($"evt.ProcessName: {evt.ProcessName}");
+                        string commandLine = (string)evt.PayloadByName("CommandLine");
+                        Console.WriteLine($"evt.CommandLine: {commandLine}");
+                        Console.WriteLine($"command line length: {commandLine.Length} ");
+                    }
                     if (!pid.HasValue && ParserUtility.MatchProcessStart(evt, source, processName, pids, commandLine))
                     {
                         pid = evt.ProcessID;
@@ -66,6 +73,13 @@ namespace ScenarioMeasurement
 
                 source.Kernel.ProcessStop += evt =>
                 {
+                    if (pids.Contains(evt.ProcessID))
+                    {
+                        Console.WriteLine($"evt.ProcessName: {evt.ProcessName}");
+                        string commandLine = (string)evt.PayloadByName("CommandLine");
+                        Console.WriteLine($"evt.CommandLine: {commandLine}");
+                        Console.WriteLine($"command line length: {commandLine.Length} ");
+                    }
                     if (pid.HasValue && ParserUtility.MatchSingleProcessID(evt, source, (int)pid))
                     {
                         results.Add(evt.TimeStampRelativeMSec - start);
