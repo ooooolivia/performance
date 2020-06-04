@@ -1,6 +1,7 @@
 ﻿using Microsoft.Diagnostics.Tracing;
 using Microsoft.Diagnostics.Tracing.Parsers;
 using Reporting;
+using System;
 using System.Collections.Generic;
 
 namespace ScenarioMeasurement

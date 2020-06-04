@@ -1,5 +1,6 @@
 ﻿using Microsoft.Diagnostics.Tracing;
 using Reporting;
+using System;
 using System.Collections.Generic;
 
 
@@ -33,6 +34,7 @@ namespace ScenarioMeasurement
                     {
                         pid = evt.ProcessID;
                         start = evt.TimeStampRelativeMSec;
+                        Console.WriteLine($"Process/Start pid:{pid} ({start})");
                     }
                 };
 
@@ -67,6 +69,7 @@ namespace ScenarioMeasurement
                     if (pid.HasValue && ParserUtility.MatchSingleProcessID(evt, source, (int)pid))
                     {
                         results.Add(evt.TimeStampRelativeMSec - start);
+                        Console.WriteLine($"Process/Stop pid:{pid} ({evt.TimeStampRelativeMSec - start})");
                         pid = null;
                         start = 0;
                         if (source.IsWindows)
