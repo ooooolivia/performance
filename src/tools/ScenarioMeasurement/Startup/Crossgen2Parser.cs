@@ -78,6 +78,7 @@ namespace ScenarioMeasurement
                 {
                     Pid = evt.ProcessID;
                     Start = evt.TimeStampRelativeMSec;
+                    Console.WriteLine($"{EventName}/Start pid:{Pid} ({Start})");
                 }
             });
         }
@@ -92,6 +93,7 @@ namespace ScenarioMeasurement
                 {
                     // Get time elapsed for this pair of start&stop events
                     double interval = evt.TimeStampRelativeMSec - Start;
+                    Console.WriteLine($"{EventName}/Stop pid:{Pid} ({evt.TimeStampRelativeMSec})");
                     // If previous pid exists, this is the same process and time elapsed is added to the last value in the stack.
                     if (PrevPid.HasValue && ParserUtility.MatchSingleProcessID(evt, source, (int)PrevPid))
                     {
