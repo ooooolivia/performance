@@ -41,12 +41,13 @@ namespace ScenarioMeasurement
 
             var processTimeParser = new ProcessTimeParser();
             Counter processTimeCounter = null;
-           /* foreach (var counter in processTimeParser.Parse(mergeTraceFile, processName, pids, commandLine))
+            foreach (var counter in processTimeParser.Parse(mergeTraceFile, processName, pids, commandLine))
             {
-                if(counter.Name == "Process Time"){
+                if (counter.Name == "Process Time")
+                {
                     processTimeCounter = counter;
                 }
-            }*/
+            }
 
             return new[] {
                 processTimeCounter,
