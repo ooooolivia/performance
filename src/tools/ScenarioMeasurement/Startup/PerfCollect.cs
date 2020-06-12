@@ -10,19 +10,21 @@ namespace ScenarioMeasurement
     {
         private readonly string startupDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         private ProcessHelper perfCollectProcess;
+        private string perfCollectScript;
         public string TraceName { get; private set; }
         public string TraceFileName { get; private set; }
         public string TraceDirectory { get; private set; }
         public string TraceFilePath { get; private set; }
         private List<KernelKeyword> KernelEvents = new List<KernelKeyword>();
         private List<ClrKeyword> ClrEvents = new List<ClrKeyword>();
+
         public PerfCollect(string traceName, Logger logger) : this(traceName, Environment.CurrentDirectory, logger)
         {
         }
 
         public PerfCollect(string traceName, string traceDirectory, Logger logger)
         {
-            string perfCollectScript = Path.Combine(startupDirectory, "perfcollect");
+            perfCollectScript = Path.Combine(startupDirectory, "perfcollect");
             if (!File.Exists(perfCollectScript))
             {
                 throw new FileNotFoundException($"Pefcollect not found at {perfCollectScript}. Please rebuild the project to download it.");
@@ -46,7 +48,7 @@ namespace ScenarioMeasurement
             perfCollectProcess = new ProcessHelper(logger)
             {
                 ProcessWillExit = true,
-                Executable = perfCollectScript,
+                Executable = "bash",
                 Timeout = 300,
                 RootAccess = true
             };
@@ -59,7 +61,7 @@ namespace ScenarioMeasurement
 
         public ProcessHelper.Result Start()
         {
-            var arguments = new StringBuilder($"start {TraceName} -events ");
+            var arguments = new StringBuilder($"{perfCollectScript} start {TraceName} -events ");
 
             foreach (var keyword in KernelEvents)
             {
@@ -81,7 +83,7 @@ namespace ScenarioMeasurement
 
         public ProcessHelper.Result Stop()
         {
-            string arguments = $"stop {TraceName} ";
+            string arguments = $"{perfCollectScript} stop {TraceName} ";
             perfCollectProcess.Arguments = arguments;
             var result = perfCollectProcess.Run().Result;
             // By default perfcollect saves traces in the current directory
@@ -106,7 +108,7 @@ namespace ScenarioMeasurement
 
         public ProcessHelper.Result Install()
         {
-            perfCollectProcess.Arguments = "install -force";
+            perfCollectProcess.Arguments = $"{perfCollectScript} install -force";
             perfCollectProcess.Run();
 
             int retry = 10;
